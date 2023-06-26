@@ -1,0 +1,28 @@
+{
+	"name": "ranking-panel",
+	"globIgnorePaths": ["**/package.json", "**/tsconfig.json"],
+	"tree": {
+		"$className": "Folder",
+		"RankingPanelServer": {
+			"$path": "out/server"
+		},
+		"RankingPanelShared": {
+			"$path": "out/shared",
+			"packages": {
+				"$path": "include",
+				"node_modules": {
+					"$className": "Folder",
+					"@rbxts": {
+						"$path": "node_modules/@rbxts"
+					},
+					"@flamework": {
+						"$path": "node_modules/@flamework"
+					}
+				}
+			}
+		},
+		"RankingPanelClient": {
+			"$path": "out/client"
+		}
+	}
+}

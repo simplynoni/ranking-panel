@@ -1,0 +1,40 @@
+{
+	"name": "ranking-panel",
+	"globIgnorePaths": ["**/package.json", "**/tsconfig.json"],
+	"tree": {
+		"$className": "DataModel",
+		"ServerScriptService": {
+			"$className": "ServerScriptService",
+			"RankingPanelServer": {
+				"$path": "out/server"
+			}
+		},
+		"ReplicatedStorage": {
+			"$className": "ReplicatedStorage",
+			"RankingPanelShared": {
+				"$path": "out/shared",
+				"packages": {
+					"$path": "include",
+					"node_modules": {
+						"$className": "Folder",
+						"@rbxts": {
+							"$path": "node_modules/@rbxts"
+						},
+						"@flamework": {
+							"$path": "node_modules/@flamework"
+						}
+					}
+				}
+			}
+		},
+		"StarterPlayer": {
+			"$className": "StarterPlayer",
+			"StarterPlayerScripts": {
+				"$className": "StarterPlayerScripts",
+				"RankingPanelClient": {
+					"$path": "out/client"
+				}
+			}
+		}
+	}
+}
