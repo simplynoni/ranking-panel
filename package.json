@@ -26,7 +26,7 @@
 	},
 	"dependencies": {
 		"@flamework/networking": "^1.0.0-beta.21",
-		"@rbxts/material-ui": "file:../roblox-material-ui/rbxts-material-ui-0.6.0.tgz",
+		"@rbxts/material-ui": "github:simplynoni/roblox-material-ui#remove-rodux",
 		"@rbxts/roact": "^1.4.4-ts.0",
 		"@rbxts/services": "^1.5.1"
 	}
