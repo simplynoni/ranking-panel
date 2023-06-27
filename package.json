@@ -19,14 +19,14 @@
 		"@rbxts/compiler-types": "^2.1.0-types.1",
 		"@rbxts/types": "^1.0.698",
 		"prettier": "^2.8.8",
-		"rbxts-transform-debug": "^2.0.3",
+		"rbxts-transform-debug": "^2.1.0-beta.0",
 		"rbxts-transformer-flamework": "^1.0.0-beta.21",
 		"rbxts-transformer-services": "^1.0.1",
 		"typescript": "^4.9.4"
 	},
 	"dependencies": {
 		"@flamework/networking": "^1.0.0-beta.21",
-		"@rbxts/material-ui": "github:simplynoni/roblox-material-ui#remove-rodux",
+		"@rbxts/material-ui": "file:../roblox-material-ui/rbxts-material-ui-0.6.0.tgz",
 		"@rbxts/roact": "^1.4.4-ts.0",
 		"@rbxts/services": "^1.5.1"
 	}

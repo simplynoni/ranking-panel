@@ -1,8 +1,11 @@
 import { Networking } from '@flamework/networking';
+import { Settings } from './types';
 
 interface ServerEvents {}
 
-interface ClientEvents {}
+interface ClientEvents {
+	InitializePanel(Settings: Settings): void;
+}
 
 interface ServerFunctions {}
 
