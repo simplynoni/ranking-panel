@@ -41,7 +41,6 @@ export default class MainUI extends Roact.Component<MainProps> {
 							this.props.GroupName
 						}<font color="#${theme.Scheme.onSurfaceVariant.ToHex()}" face="GothamMedium"> | Ranking Panel</font>`}
 						RichText
-						TextAlignment={Enum.TextXAlignment.Left}
 						Theme={theme}
 						CloseFunction={() => {
 							// todo
