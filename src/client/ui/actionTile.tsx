@@ -4,7 +4,7 @@ import Roact from '@rbxts/roact';
 import { ThemeProps } from '@rbxts/material-ui';
 import { Gotham, GothamBold } from '@rbxts/material-ui/out/Fonts';
 
-interface ColorTileProps extends ThemeProps {
+interface ActionTileProps extends ThemeProps {
 	Title: string;
 	Description?: string;
 	AnchorPoint?: Vector2;
@@ -14,11 +14,11 @@ interface ColorTileProps extends ThemeProps {
 	PressedEvent?: () => void;
 }
 
-export default class CommandTile extends Roact.PureComponent<ColorTileProps> {
+export default class ActionTile extends Roact.PureComponent<ActionTileProps> {
 	stateMotor: SingleMotor;
 	stateBinding: Roact.Binding<number>;
 
-	constructor(props: ColorTileProps) {
+	constructor(props: ActionTileProps) {
 		super(props);
 
 		this.stateMotor = new SingleMotor(0);
@@ -35,7 +35,7 @@ export default class CommandTile extends Roact.PureComponent<ColorTileProps> {
 
 		return (
 			<textbutton
-				Key='CommandTle'
+				Key='ActionTile'
 				AnchorPoint={this.props.AnchorPoint}
 				Position={this.props.Position}
 				Size={this.props.Size ?? new UDim2(1, 0, 0, 72)}
@@ -71,7 +71,7 @@ export default class CommandTile extends Roact.PureComponent<ColorTileProps> {
 					Key='Divider'
 					AnchorPoint={new Vector2(0.5, 0.5)}
 					Position={new UDim2(0.5, 0, 1, 1)}
-					Size={new UDim2(1, -32, 0, 1)}
+					Size={new UDim2(1, -24, 0, 1)}
 					BackgroundColor3={theme.Scheme.outline}
 					BorderSizePixel={0}
 				/>
@@ -84,8 +84,8 @@ export default class CommandTile extends Roact.PureComponent<ColorTileProps> {
 				>
 					<uipadding
 						PaddingBottom={new UDim(0, 12)}
-						PaddingLeft={new UDim(0, 16)}
-						PaddingRight={new UDim(0, 16)}
+						PaddingLeft={new UDim(0, 24)}
+						PaddingRight={new UDim(0, 24)}
 						PaddingTop={new UDim(0, 12)}
 					/>
 					<uilistlayout

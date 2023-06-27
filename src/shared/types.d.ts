@@ -9,13 +9,13 @@ export interface Settings {
 	RemoveCredit: boolean;
 }
 
-export interface CommandArg {
+export interface ActionArg {
 	Name: string;
 	Type: 'User' | 'Rank' | 'String';
 }
 
-export interface Command {
+export interface Action {
 	Name: string;
 	Description: string;
-	Args: CommandArg[];
+	Args: ActionArg[];
 }
