@@ -35,6 +35,12 @@
 					"$path": "out/client"
 				}
 			}
+		},
+		"Workspace": {
+			"$className": "Workspace",
+			"Baseplate": {
+				"$path": "baseplate.rbxmx"
+			}
 		}
 	}
 }
