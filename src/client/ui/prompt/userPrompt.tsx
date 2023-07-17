@@ -2,7 +2,9 @@ import { Linear, SingleMotor } from '@rbxts/flipper';
 import { Icon, ThemeProps, ThemeState } from '@rbxts/material-ui';
 import { Gotham, GothamBold } from '@rbxts/material-ui/out/Fonts';
 import Roact from '@rbxts/roact';
+import { RouteRendererProps } from '@rbxts/roact-router/typings/Route';
 import { Players, UserService } from '@rbxts/services';
+import RouteBase from './routeBase';
 
 interface SearchResults {
 	Image: string;
@@ -11,7 +13,10 @@ interface SearchResults {
 	InServer: boolean;
 }
 
-interface PageProps {
+interface PageProps extends RouteRendererProps {
+	PositionBinding: Roact.Binding<number>;
+	FadeBinding: Roact.Binding<number>;
+	Visible: boolean;
 	Theme: ThemeState;
 }
 
@@ -22,7 +27,7 @@ interface PageState {
 	NoResults: boolean;
 }
 
-export default class UserPage extends Roact.Component<PageProps, PageState> {
+class UserPageBase extends Roact.Component<PageProps, PageState> {
 	CurrentThread?: thread;
 
 	constructor(props: PageProps) {
@@ -47,7 +52,18 @@ export default class UserPage extends Roact.Component<PageProps, PageState> {
 		}
 
 		return (
-			<frame Key='UserPage' Size={UDim2.fromScale(1, 1)} BackgroundTransparency={1}>
+			<canvasgroup
+				Key={'UserPage'}
+				GroupTransparency={this.props.FadeBinding.map((fade) => fade)}
+				AnchorPoint={new Vector2(0.5, 0.5)}
+				Position={this.props.PositionBinding.map((x) => {
+					return UDim2.fromScale(x, 0.5);
+				})}
+				BackgroundTransparency={1}
+				Size={UDim2.fromScale(1, 1)}
+				Visible={this.props.Visible}
+				ZIndex={this.props.match ? 2 : 1}
+			>
 				<uipadding PaddingTop={new UDim(0, 5)} />
 				<frame Key='SearchHolder' Size={UDim2.fromScale(1, 0.3)} BackgroundTransparency={1}>
 					<textbox
@@ -152,7 +168,7 @@ export default class UserPage extends Roact.Component<PageProps, PageState> {
 					<uilistlayout SortOrder='LayoutOrder' />
 					{...results}
 				</scrollingframe>
-			</frame>
+			</canvasgroup>
 		);
 	}
 
@@ -354,6 +370,19 @@ class UserTile extends Roact.PureComponent<UserTileProps> {
 					</frame>
 				</frame>
 			</textbutton>
+		);
+	}
+}
+
+export default class UserPage extends RouteBase<{ Theme: ThemeState }> {
+	render() {
+		return (
+			<UserPageBase
+				Visible={this.state.Visible}
+				PositionBinding={this.positionBinding}
+				FadeBinding={this.fadeBinding}
+				{...this.props}
+			/>
 		);
 	}
 }

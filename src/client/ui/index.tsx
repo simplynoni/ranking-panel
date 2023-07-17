@@ -1,12 +1,14 @@
 import { ThemeState, Topbar, UIBase } from '@rbxts/material-ui';
 import { Gotham } from '@rbxts/material-ui/out/Fonts';
 import Roact from '@rbxts/roact';
+import { Router } from '@rbxts/roact-router';
 import { $package } from 'rbxts-transform-debug';
 import CommandTile from './actionTile';
 import Prompt from './prompt';
 
 interface MainProps {
 	GroupName: string;
+	GroupId: number;
 	Theme: ThemeState;
 	RemoveCredit?: boolean;
 }
@@ -32,7 +34,9 @@ export default class MainUI extends Roact.Component<MainProps> {
 					BackgroundTransparency={0.6} // todo
 				>
 					<uicorner CornerRadius={new UDim(0, 16)} />
-					<Prompt Theme={theme} />
+					<Router>
+						<Prompt GroupId={this.props.GroupId} Theme={theme} />
+					</Router>
 				</frame>
 				<frame Key='Holder' Size={UDim2.fromScale(1, 1)} BackgroundTransparency={1}>
 					<uilistlayout SortOrder='LayoutOrder' />

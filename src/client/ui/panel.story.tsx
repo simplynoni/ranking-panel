@@ -10,7 +10,7 @@ export = function (frame: GuiObject) {
 		Scheme: scheme,
 		Theme: Theme.Light,
 	};
-	const component = <MainUI GroupName='Group Name' Theme={theme} />;
+	const component = <MainUI GroupName='Group Name' GroupId={1} Theme={theme} />;
 
 	const tree = Roact.mount(component, frame);
 

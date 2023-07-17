@@ -17,7 +17,12 @@ Events.InitializePanel.connect((settings) => {
 
 	Roact.mount(
 		<screengui ResetOnSpawn={false} IgnoreGuiInset>
-			<MainUI GroupName={groupInfo.Name} Theme={theme} RemoveCredit={settings.RemoveCredit} />
+			<MainUI
+				GroupName={groupInfo.Name}
+				GroupId={settings.GroupId}
+				Theme={theme}
+				RemoveCredit={settings.RemoveCredit}
+			/>
 		</screengui>,
 		playerGui,
 		'RankingPanel',
