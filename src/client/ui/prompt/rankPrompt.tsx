@@ -83,7 +83,6 @@ class RankPageBase extends Roact.Component<PageProps, PageState> {
 						LayoutOrder={1}
 						Event={{
 							Focused: () => {
-								this.props.history.goBack();
 								this.setState({
 									SearchPlaceholder: false,
 								});
