@@ -2,12 +2,14 @@ import { OutlinedButton, ThemeState, TonalButton, Topbar, UIBase } from '@rbxts/
 import { Gotham } from '@rbxts/material-ui/out/Fonts';
 import Roact from '@rbxts/roact';
 import { Route, RouterContext } from '@rbxts/roact-router';
+import { panelStore } from 'client/state';
 import RankPage from './rankPrompt';
 import UserPage from './userPrompt';
 
 interface PromptProps {
 	Theme: ThemeState;
 	GroupId: number;
+	Visible: boolean;
 }
 
 export default class Prompt extends Roact.Component<PromptProps> {
@@ -27,6 +29,7 @@ export default class Prompt extends Roact.Component<PromptProps> {
 							Position={UDim2.fromScale(0.5, 0.5)}
 							Size={UDim2.fromScale(0.6, 0.65)}
 							Theme={theme}
+							Closed={!this.props.Visible}
 						>
 							<uilistlayout SortOrder='LayoutOrder' />
 							<Topbar
@@ -36,7 +39,7 @@ export default class Prompt extends Roact.Component<PromptProps> {
 								RichText
 								Theme={theme}
 								CloseFunction={() => {
-									print('close');
+									panelStore.dispatch({ type: 'SetPromptVisible', promptVisible: false });
 								}}
 							/>
 							<frame Key='Content' Size={UDim2.fromScale(1, 0.6)} BackgroundTransparency={1}>

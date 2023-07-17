@@ -1,8 +1,12 @@
 import { ThemeState, Topbar, UIBase } from '@rbxts/material-ui';
 import { Gotham } from '@rbxts/material-ui/out/Fonts';
 import Roact from '@rbxts/roact';
+import { connect } from '@rbxts/roact-rodux';
 import { Router } from '@rbxts/roact-router';
+import { PanelState, panelStore } from 'client/state';
+import { PromptState } from 'client/state/reducers/promptReducer';
 import { $package } from 'rbxts-transform-debug';
+import { PromptArg, PromptType } from 'shared/types';
 import CommandTile from './actionTile';
 import Prompt from './prompt';
 
@@ -13,8 +17,9 @@ interface MainProps {
 	RemoveCredit?: boolean;
 }
 
-export default class MainUI extends Roact.Component<MainProps> {
+class PanelBase extends Roact.Component<MainProps & PromptState> {
 	public render(): Roact.Element | undefined {
+		print(this.props);
 		const theme = this.props.Theme;
 		return (
 			<UIBase
@@ -35,7 +40,7 @@ export default class MainUI extends Roact.Component<MainProps> {
 				>
 					<uicorner CornerRadius={new UDim(0, 16)} />
 					<Router>
-						<Prompt GroupId={this.props.GroupId} Theme={theme} />
+						<Prompt GroupId={this.props.GroupId} Visible={this.props.promptVisible} Theme={theme} />
 					</Router>
 				</frame>
 				<frame Key='Holder' Size={UDim2.fromScale(1, 1)} BackgroundTransparency={1}>
@@ -67,6 +72,9 @@ export default class MainUI extends Roact.Component<MainProps> {
 							Title='Rank'
 							Description='Moves the user to a specified rank in the group.'
 							Theme={theme}
+							PressedEvent={() => {
+								panelStore.dispatch({ type: 'SetPromptVisible', promptVisible: true });
+							}}
 						/>
 						<CommandTile
 							Title='Promote'
@@ -110,4 +118,19 @@ export default class MainUI extends Roact.Component<MainProps> {
 			</UIBase>
 		);
 	}
+
+	protected didMount(): void {
+		const arg1 = identity<PromptArg>({
+			Name: 'test',
+			Type: PromptType.Rank,
+			OnChanged: (value) => {
+				print(value);
+			},
+		});
+		panelStore.dispatch({ type: 'SetPromptArgs', promptArgs: [arg1] });
+	}
 }
+
+export default connect<PromptState, {}, MainProps, PanelState>((state, props) => {
+	return { ...state.promptState };
+})(PanelBase);
