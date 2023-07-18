@@ -94,6 +94,9 @@ class PanelBase extends Roact.Component<MainProps & PromptState & PanelState> {
 						Theme={theme}
 						CloseFunction={() => {
 							clientStore.dispatch({ type: 'SetPanelVisible', panelVisible: false });
+							clientStore.dispatch({ type: 'SetPromptArgs', promptArgs: [] });
+							clientStore.dispatch({ type: 'SetPromptName', promptName: '' });
+							clientStore.dispatch({ type: 'SetPromptVisible', promptVisible: false });
 						}}
 					/>
 					<scrollingframe
