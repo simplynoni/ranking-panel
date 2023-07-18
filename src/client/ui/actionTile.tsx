@@ -11,6 +11,7 @@ interface ActionTileProps extends ThemeProps {
 	Position?: UDim2;
 	Size?: UDim2;
 	LayoutOrder?: number;
+	Disabled?: boolean;
 	PressedEvent?: () => void;
 }
 
@@ -49,20 +50,24 @@ export default class ActionTile extends Roact.PureComponent<ActionTileProps> {
 				AutoButtonColor={false}
 				Event={{
 					MouseButton1Click: async () => {
-						if (this.props.PressedEvent) {
+						if (this.props.PressedEvent && !this.props.Disabled) {
 							this.props.PressedEvent();
 						}
 					},
 					MouseButton1Up: async () => {
+						if (this.props.Disabled) return;
 						this.stateMotor.setGoal(new Linear(0.08, { velocity: 0.5 }));
 					},
 					MouseEnter: () => {
+						if (this.props.Disabled) return;
 						this.stateMotor.setGoal(new Linear(0.08, { velocity: 0.5 }));
 					},
 					MouseButton1Down: () => {
+						if (this.props.Disabled) return;
 						this.stateMotor.setGoal(new Linear(0.12, { velocity: 0.5 }));
 					},
 					MouseLeave: () => {
+						if (this.props.Disabled) return;
 						this.stateMotor.setGoal(new Linear(0, { velocity: 0.5 }));
 					},
 				}}
@@ -135,5 +140,11 @@ export default class ActionTile extends Roact.PureComponent<ActionTileProps> {
 				</frame>
 			</textbutton>
 		);
+	}
+
+	protected didUpdate(previousProps: ActionTileProps, previousState: {}): void {
+		if (previousProps.Disabled !== this.props.Disabled && this.props.Disabled) {
+			this.stateMotor.setGoal(new Linear(0, { velocity: 0.5 }));
+		}
 	}
 }

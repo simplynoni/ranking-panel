@@ -2,21 +2,22 @@ import { Linear, SingleMotor } from '@rbxts/flipper';
 import { Icon, ThemeProps, ThemeState } from '@rbxts/material-ui';
 import { Gotham, GothamBold } from '@rbxts/material-ui/out/Fonts';
 import Roact from '@rbxts/roact';
-import { RouteRendererProps } from '@rbxts/roact-router/typings/Route';
 import { GroupService, Players } from '@rbxts/services';
-import RouteBase from './routeBase';
+import RouteBase from './pageBase';
 
 interface SearchResults {
 	Name: string;
 	Rank: number;
 }
 
-interface PageProps extends RouteRendererProps {
+interface PageProps {
 	PositionBinding: Roact.Binding<number>;
 	FadeBinding: Roact.Binding<number>;
 	Visible: boolean;
+	PageVisible: boolean;
 	Theme: ThemeState;
 	GroupId: number;
+	OnChanged?: (rank: number) => void;
 }
 
 interface PageState {
@@ -50,7 +51,17 @@ class RankPageBase extends Roact.Component<PageProps, PageState> {
 
 		const results: Roact.Element[] = [];
 		for (const [_, result] of pairs(this.state.SearchResults)) {
-			results.push(<RankTile {...result} Theme={theme} />);
+			results.push(
+				<RankTile
+					{...result}
+					Theme={theme}
+					PressedEvent={() => {
+						if (this.props.OnChanged) {
+							this.props.OnChanged(result.Rank);
+						}
+					}}
+				/>,
+			);
 		}
 
 		return (
@@ -63,8 +74,8 @@ class RankPageBase extends Roact.Component<PageProps, PageState> {
 				})}
 				BackgroundTransparency={1}
 				Size={UDim2.fromScale(1, 1)}
-				Visible={this.props.Visible}
-				ZIndex={this.props.match ? 2 : 1}
+				Visible={this.props.PageVisible}
+				ZIndex={this.props.Visible ? 2 : 1}
 			>
 				<uipadding PaddingTop={new UDim(0, 5)} />
 				<frame Key='SearchHolder' Size={UDim2.fromScale(1, 0.3)} BackgroundTransparency={1}>
@@ -162,7 +173,7 @@ class RankPageBase extends Roact.Component<PageProps, PageState> {
 					BackgroundTransparency={1}
 					BorderSizePixel={0}
 					ScrollBarImageColor3={theme.Scheme.outline}
-					ScrollBarThickness={3}
+					ScrollBarThickness={this.props.Visible ? 3 : 0}
 					CanvasSize={UDim2.fromScale(0)}
 					AutomaticCanvasSize='Y'
 					Visible={!this.state.NoResults}
@@ -292,11 +303,15 @@ class RankTile extends Roact.PureComponent<RankTileProps> {
 	}
 }
 
-export default class RankPage extends RouteBase<{ Theme: ThemeState; GroupId: number }> {
+export default class RankPage extends RouteBase<{
+	Theme: ThemeState;
+	GroupId: number;
+	OnChanged?: (rank: number) => void;
+}> {
 	render() {
 		return (
 			<RankPageBase
-				Visible={this.state.Visible}
+				PageVisible={this.state.PageVisible}
 				PositionBinding={this.positionBinding}
 				FadeBinding={this.fadeBinding}
 				{...this.props}

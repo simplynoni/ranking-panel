@@ -2,22 +2,24 @@ import { Linear, SingleMotor } from '@rbxts/flipper';
 import { Icon, ThemeProps, ThemeState } from '@rbxts/material-ui';
 import { Gotham, GothamBold } from '@rbxts/material-ui/out/Fonts';
 import Roact from '@rbxts/roact';
-import { RouteRendererProps } from '@rbxts/roact-router/typings/Route';
 import { Players, UserService } from '@rbxts/services';
-import RouteBase from './routeBase';
+import RouteBase from './pageBase';
 
 interface SearchResults {
 	Image: string;
 	DisplayName: string;
 	Username: string;
+	UserId: number;
 	InServer: boolean;
 }
 
-interface PageProps extends RouteRendererProps {
+interface PageProps {
 	PositionBinding: Roact.Binding<number>;
 	FadeBinding: Roact.Binding<number>;
 	Visible: boolean;
+	PageVisible: boolean;
 	Theme: ThemeState;
+	OnChanged?: (userId: number) => void;
 }
 
 interface PageState {
@@ -48,7 +50,17 @@ class UserPageBase extends Roact.Component<PageProps, PageState> {
 
 		const results: Roact.Element[] = [];
 		for (const [_, result] of pairs(this.state.SearchResults)) {
-			results.push(<UserTile {...result} Theme={theme} />);
+			results.push(
+				<UserTile
+					{...result}
+					Theme={theme}
+					PressedEvent={() => {
+						if (this.props.OnChanged) {
+							this.props.OnChanged(result.UserId);
+						}
+					}}
+				/>,
+			);
 		}
 
 		return (
@@ -61,8 +73,8 @@ class UserPageBase extends Roact.Component<PageProps, PageState> {
 				})}
 				BackgroundTransparency={1}
 				Size={UDim2.fromScale(1, 1)}
-				Visible={this.props.Visible}
-				ZIndex={this.props.match ? 2 : 1}
+				Visible={this.props.PageVisible}
+				ZIndex={this.props.Visible ? 2 : 1}
 			>
 				<uipadding PaddingTop={new UDim(0, 5)} />
 				<frame Key='SearchHolder' Size={UDim2.fromScale(1, 0.3)} BackgroundTransparency={1}>
@@ -160,7 +172,7 @@ class UserPageBase extends Roact.Component<PageProps, PageState> {
 					BackgroundTransparency={1}
 					BorderSizePixel={0}
 					ScrollBarImageColor3={theme.Scheme.outline}
-					ScrollBarThickness={3}
+					ScrollBarThickness={this.props.Visible ? 3 : 0}
 					CanvasSize={UDim2.fromScale(0)}
 					AutomaticCanvasSize='Y'
 					Visible={!this.state.NoResults}
@@ -178,12 +190,16 @@ class UserPageBase extends Roact.Component<PageProps, PageState> {
 		searchText = searchText.lower();
 
 		for (const [_, user] of pairs(Players.GetPlayers())) {
-			if (user !== Players.LocalPlayer && user.Name.lower().find(searchText)[0]) {
+			if (
+				user !== Players.LocalPlayer &&
+				(user.Name.lower().find(searchText)[0] || user.DisplayName.lower().find(searchText)[0])
+			) {
 				const image = Players.GetUserThumbnailAsync(user.UserId, 'HeadShot', 'Size48x48')[0];
 				const result: SearchResults = {
 					Image: image,
 					DisplayName: user.DisplayName,
 					Username: user.Name,
+					UserId: user.UserId,
 					InServer: true,
 				};
 				results.push(result);
@@ -205,6 +221,7 @@ class UserPageBase extends Roact.Component<PageProps, PageState> {
 						Image: image,
 						DisplayName: userInfo.DisplayName,
 						Username: userInfo.Username,
+						UserId: userId,
 						InServer: false,
 					};
 					results.push(result);
@@ -374,11 +391,11 @@ class UserTile extends Roact.PureComponent<UserTileProps> {
 	}
 }
 
-export default class UserPage extends RouteBase<{ Theme: ThemeState }> {
+export default class UserPage extends RouteBase<{ Theme: ThemeState; OnChanged?: (userId: number) => void }> {
 	render() {
 		return (
 			<UserPageBase
-				Visible={this.state.Visible}
+				PageVisible={this.state.PageVisible}
 				PositionBinding={this.positionBinding}
 				FadeBinding={this.fadeBinding}
 				{...this.props}

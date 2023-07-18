@@ -18,6 +18,7 @@ export enum PromptType {
 export interface PromptArg {
 	Name: string;
 	Type: PromptType;
+	Value: unknown;
 	OnChanged: (value: unknown) => void;
 }
 
