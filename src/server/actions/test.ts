@@ -5,8 +5,8 @@ export = {
 	Name: 'test',
 	Description: 'test action',
 	Args: [
-		{ Name: 'test', Type: PromptType.User },
-		{ Name: 'test2', Type: PromptType.Rank },
+		{ Name: 'test', Type: PromptType.Text },
+		// { Name: 'test2', Type: PromptType.Rank },
 	],
 	Permissions: config.RankingPermissions,
 	Run: (player, args) => {

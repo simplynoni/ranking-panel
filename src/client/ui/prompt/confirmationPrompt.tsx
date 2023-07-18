@@ -157,6 +157,43 @@ class ConfirmationPageBase extends Roact.Component<PageProps, PageState> {
 							</textlabel>
 						</>,
 					);
+				} else if (arg.Type === PromptType.Text && typeIs(argValue, 'string')) {
+					elements.push(
+						<>
+							<textlabel
+								Size={UDim2.fromScale(1, 0.2)}
+								BackgroundTransparency={1}
+								Text={arg.Name}
+								FontFace={GothamMedium}
+								TextColor3={theme.Scheme.onBackground}
+								TextXAlignment='Left'
+								TextScaled
+							>
+								<uipadding
+									PaddingBottom={new UDim(0, 5)}
+									PaddingLeft={new UDim(0, 12)}
+									PaddingRight={new UDim(0, 12)}
+								/>
+							</textlabel>
+							<textlabel
+								Size={UDim2.fromScale(1, 0.175)}
+								BackgroundTransparency={1}
+								Text={argValue}
+								FontFace={Gotham}
+								TextColor3={theme.Scheme.onBackground}
+								TextXAlignment='Left'
+								TextTruncate='AtEnd'
+								TextScaled
+							>
+								<uipadding
+									PaddingBottom={new UDim(0, 5)}
+									PaddingLeft={new UDim(0, 12)}
+									PaddingRight={new UDim(0, 12)}
+								/>
+								<uitextsizeconstraint MinTextSize={15} />
+							</textlabel>
+						</>,
+					);
 				}
 			}
 			this.setState({

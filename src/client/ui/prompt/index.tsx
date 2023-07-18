@@ -7,6 +7,7 @@ import { panelStore } from 'client/state';
 import { PromptArg, PromptType } from 'shared/types';
 import ConfirmationPage from './confirmationPrompt';
 import RankPage from './rankPrompt';
+import TextPage from './textPrompt';
 import UserPage from './userPrompt';
 
 interface PromptProps {
@@ -93,6 +94,24 @@ export default class Prompt extends Roact.Component<PromptProps, PromptState> {
 						/>,
 					);
 					break;
+				}
+				case PromptType.Text: {
+					pages.push(
+						<TextPage
+							Name={arg.Name}
+							PromptContainerVisible={this.props.Visible}
+							Visible={index === this.state.PageIndex + 1}
+							Instant={this.state.Instant}
+							OnChanged={(text) => {
+								const args = this.state.Args;
+								args.set(arg.Name, text);
+								this.setState({
+									Args: args,
+								});
+							}}
+							Theme={theme}
+						/>,
+					);
 				}
 			}
 		}
