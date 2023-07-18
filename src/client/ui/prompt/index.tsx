@@ -7,9 +7,10 @@ import RankPage from './rankPrompt';
 import UserPage from './userPrompt';
 
 interface PromptProps {
-	Theme: ThemeState;
-	GroupId: number;
+	GroupInfo: GroupInfo;
+	BotRank: number;
 	Visible: boolean;
+	Theme: ThemeState;
 	Name: string;
 	Args: PromptArg[];
 	OnSubmitted?: () => void;
@@ -18,6 +19,7 @@ interface PromptProps {
 interface PromptState {
 	PageIndex: number;
 	Instant: boolean;
+	Args: Map<string, unknown>;
 }
 
 export default class Prompt extends Roact.Component<PromptProps, PromptState> {
@@ -27,12 +29,71 @@ export default class Prompt extends Roact.Component<PromptProps, PromptState> {
 		this.setState({
 			PageIndex: 0,
 			Instant: true,
+			Args: new Map(),
 		});
 	}
 
 	public render(): Roact.Element | undefined {
 		const theme = this.props.Theme;
-		const arg = this.props.Args[this.state.PageIndex];
+		const currentArg = this.props.Args[this.state.PageIndex];
+
+		const pages: Roact.Element[] = [];
+		for (const [index, arg] of pairs(this.props.Args)) {
+			switch (arg.Type) {
+				case PromptType.Rank: {
+					let selectedRank = 0;
+					const argValue = this.state.Args.get(arg.Name);
+					if (argValue && typeIs(argValue, 'number')) {
+						selectedRank = argValue;
+					}
+					pages.push(
+						<RankPage
+							GroupInfo={this.props.GroupInfo}
+							BotRank={this.props.BotRank}
+							PromptContainerVisible={this.props.Visible}
+							Visible={index === this.state.PageIndex + 1}
+							Instant={this.state.Instant}
+							SelectedRank={selectedRank}
+							OnChanged={(rank) => {
+								const args = this.state.Args;
+								args.set(arg.Name, rank);
+								this.setState({
+									Args: args,
+								});
+							}}
+							Theme={theme}
+						/>,
+					);
+					break;
+				}
+				case PromptType.User: {
+					let selectedUser = 0;
+					const argValue = this.state.Args.get(arg.Name);
+					if (argValue && typeIs(argValue, 'number')) {
+						selectedUser = argValue;
+					}
+					pages.push(
+						<UserPage
+							GroupInfo={this.props.GroupInfo}
+							BotRank={this.props.BotRank}
+							PromptContainerVisible={this.props.Visible}
+							Visible={index === this.state.PageIndex + 1}
+							Instant={this.state.Instant}
+							SelectedUser={selectedUser}
+							OnChanged={(userId) => {
+								const args = this.state.Args;
+								args.set(arg.Name, userId);
+								this.setState({
+									Args: args,
+								});
+							}}
+							Theme={theme}
+						/>,
+					);
+					break;
+				}
+			}
+		}
 
 		return (
 			<UIBase
@@ -47,30 +108,24 @@ export default class Prompt extends Roact.Component<PromptProps, PromptState> {
 					Title={`${
 						this.props.Name
 					} <font color="#${theme.Scheme.onSurfaceVariant.ToHex()}" face="GothamMedium">> ${
-						arg ? arg.Name : ''
+						currentArg ? currentArg.Name : ''
 					}</font>`}
 					Height={new UDim(0.2)}
 					TextAlignment={Enum.TextXAlignment.Left}
 					RichText
 					Theme={theme}
 					CloseFunction={() => {
+						const args = this.state.Args;
+						args.clear();
+						this.setState({
+							Args: args,
+						});
 						panelStore.dispatch({ type: 'SetPromptVisible', promptVisible: false });
 					}}
 				/>
 				<frame Key='Content' Size={UDim2.fromScale(1, 0.6)} BackgroundTransparency={1}>
 					{/* Pages here */}
-					<UserPage
-						Visible={arg ? arg.Type === PromptType.User : false}
-						Instant={this.state.Instant}
-						Theme={theme}
-					/>
-					<RankPage
-						GroupId={this.props.GroupId}
-						Visible={arg ? arg.Type === PromptType.Rank : false}
-						Instant={this.state.Instant}
-						OnChanged={arg ? arg.OnChanged : undefined}
-						Theme={theme}
-					/>
+					{...pages}
 				</frame>
 				<frame Key='Footer' Size={UDim2.fromScale(1, 0.2)} BackgroundTransparency={1}>
 					<frame
@@ -118,11 +173,19 @@ export default class Prompt extends Roact.Component<PromptProps, PromptState> {
 						AutomaticSize
 						Theme={theme}
 						Pressed={() => {
+							const args = this.state.Args;
+							// args.clear();
 							this.setState({
 								PageIndex: math.min(this.state.PageIndex + 1, this.props.Args.size() - 1),
 								Instant: false,
+								// Args: args,
 							});
 						}}
+						Disabled={
+							this.props.Args[this.state.PageIndex]
+								? !this.state.Args.get(this.props.Args[this.state.PageIndex].Name)
+								: true
+						}
 					/>
 				</frame>
 			</UIBase>

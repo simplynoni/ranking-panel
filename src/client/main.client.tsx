@@ -8,7 +8,7 @@ import Panel from './ui';
 
 const playerGui = Players.LocalPlayer.WaitForChild('PlayerGui') as PlayerGui;
 
-Events.InitializePanel.connect((settings) => {
+Events.InitializePanel.connect((settings, actions) => {
 	const groupInfo = GroupService.GetGroupInfoAsync(settings.GroupId);
 	const theme: ThemeState = {
 		Color: settings.Color,
@@ -21,8 +21,9 @@ Events.InitializePanel.connect((settings) => {
 		<screengui ResetOnSpawn={false} ZIndexBehavior={'Sibling'} IgnoreGuiInset>
 			<StoreProvider store={panelStore}>
 				<Panel
-					GroupName={groupInfo.Name}
-					GroupId={settings.GroupId}
+					GroupInfo={groupInfo}
+					BotRank={settings.BotRank}
+					Actions={actions}
 					Theme={theme}
 					RemoveCredit={settings.RemoveCredit}
 				/>

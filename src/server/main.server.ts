@@ -1,18 +1,12 @@
-import { Theme } from '@rbxts/material-ui';
 import { Players } from '@rbxts/services';
-import { Settings } from 'shared/types';
+import ActionHandler from './actionHandler';
+import config from './config';
 import { Events } from './network';
 
-const tempSettings: Settings = {
-	GroupId: 5641002,
-
-	Color: Color3.fromRGB(120, 28, 227),
-	Theme: Theme.Dark,
-
-	RemoveCredit: false,
-};
-
 Players.PlayerAdded.Connect((player) => {
-	// todo: permissions
-	Events.InitializePanel.fire(player, tempSettings);
+	const actionHandler = new ActionHandler(player);
+
+	if (actionHandler.HasPanelPermission()) {
+		Events.InitializePanel.fire(player, config, actionHandler.GetUsableClientActions());
+	}
 });

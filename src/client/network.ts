@@ -1,4 +1,4 @@
-import { GlobalEvents, GlobalFunctions } from "shared/network";
+import { PanelEvents, PanelFunctions } from 'shared/network';
 
-export const Events = GlobalEvents.client;
-export const Functions = GlobalFunctions.client;
+export const Events = PanelEvents.client;
+export const Functions = PanelFunctions.client;

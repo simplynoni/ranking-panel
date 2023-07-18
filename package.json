@@ -16,16 +16,18 @@
 	"author": "",
 	"license": "ISC",
 	"devDependencies": {
-		"@rbxts/compiler-types": "^2.1.0-types.1",
-		"@rbxts/types": "^1.0.698",
+		"@rbxts/compiler-types": "^2.1.1-types.0",
+		"@rbxts/types": "^1.0.705",
 		"prettier": "^2.8.8",
 		"rbxts-transform-debug": "^2.1.0-beta.0",
-		"rbxts-transformer-flamework": "^1.0.0-beta.21",
+		"rbxts-transformer-flamework": "^1.0.0-beta.22",
 		"rbxts-transformer-services": "^1.0.1",
+		"roblox-ts": "^2.1.1",
 		"typescript": "^4.9.4"
 	},
 	"dependencies": {
-		"@flamework/networking": "^1.0.0-beta.21",
+		"@flamework/core": "^1.0.0-beta.22",
+		"@flamework/networking": "^1.0.0-beta.22",
 		"@rbxts/llama": "^1.1.1-ts.1",
 		"@rbxts/material-ui": "github:simplynoni/roblox-material-ui",
 		"@rbxts/roact": "^1.4.4-ts.0",

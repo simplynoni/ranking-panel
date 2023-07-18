@@ -1,8 +1,8 @@
-import { Linear, SingleMotor } from '@rbxts/flipper';
+import { Instant, Linear, SingleMotor } from '@rbxts/flipper';
 import { Icon, ThemeProps, ThemeState } from '@rbxts/material-ui';
 import { Gotham, GothamBold } from '@rbxts/material-ui/out/Fonts';
 import Roact from '@rbxts/roact';
-import { Players, UserService } from '@rbxts/services';
+import { GroupService, Players, UserService } from '@rbxts/services';
 import RouteBase from './pageBase';
 
 interface SearchResults {
@@ -18,6 +18,10 @@ interface PageProps {
 	FadeBinding: Roact.Binding<number>;
 	Visible: boolean;
 	PageVisible: boolean;
+	GroupInfo: GroupInfo;
+	BotRank: number;
+	PromptContainerVisible: boolean;
+	SelectedUser: number;
 	Theme: ThemeState;
 	OnChanged?: (userId: number) => void;
 }
@@ -29,11 +33,18 @@ interface PageState {
 	NoResults: boolean;
 }
 
+const GroupCache = new Map<number, number>();
+
 class UserPageBase extends Roact.Component<PageProps, PageState> {
 	CurrentThread?: thread;
+	PlayerRank = 0;
 
 	constructor(props: PageProps) {
 		super(props);
+
+		task.spawn(() => {
+			this.PlayerRank = Players.LocalPlayer.GetRankInGroup(this.props.GroupInfo.Id);
+		});
 
 		this.setState({
 			SearchText: '',
@@ -53,6 +64,7 @@ class UserPageBase extends Roact.Component<PageProps, PageState> {
 			results.push(
 				<UserTile
 					{...result}
+					Selected={this.props.SelectedUser === result.UserId}
 					Theme={theme}
 					PressedEvent={() => {
 						if (this.props.OnChanged) {
@@ -84,7 +96,7 @@ class UserPageBase extends Roact.Component<PageProps, PageState> {
 						Position={UDim2.fromScale(0.5, 0.5)}
 						Size={new UDim2(1, -24, 1, 0)}
 						BackgroundColor3={theme.Scheme.surfaceVariant}
-						Text=''
+						Text={this.state.SearchText}
 						TextColor3={theme.Scheme.onSurfaceVariant}
 						PlaceholderColor3={theme.Scheme.onSurfaceVariant}
 						FontFace={GothamBold}
@@ -194,6 +206,11 @@ class UserPageBase extends Roact.Component<PageProps, PageState> {
 				user !== Players.LocalPlayer &&
 				(user.Name.lower().find(searchText)[0] || user.DisplayName.lower().find(searchText)[0])
 			) {
+				const rank = GroupCache.get(user.UserId) || user.GetRankInGroup(this.props.GroupInfo.Id);
+				if (rank > 0) {
+					GroupCache.set(user.UserId, rank);
+				}
+				if (rank === 0 || rank >= this.PlayerRank || rank >= this.props.BotRank) continue;
 				const image = Players.GetUserThumbnailAsync(user.UserId, 'HeadShot', 'Size48x48')[0];
 				const result: SearchResults = {
 					Image: image,
@@ -212,19 +229,34 @@ class UserPageBase extends Roact.Component<PageProps, PageState> {
 			});
 
 			if (userId && typeIs(userId, 'number')) {
-				const userInfo = await Promise.try(() => UserService.GetUserInfosByUserIdsAsync([userId])[0]).catch();
-				const [image] = await Promise.try(() =>
-					Players.GetUserThumbnailAsync(userId, 'HeadShot', 'Size48x48'),
-				).catch();
-				if (userInfo) {
-					const result: SearchResults = {
-						Image: image,
-						DisplayName: userInfo.DisplayName,
-						Username: userInfo.Username,
-						UserId: userId,
-						InServer: false,
-					};
-					results.push(result);
+				let rank = GroupCache.get(userId);
+				if (!rank) {
+					const groups = GroupService.GetGroupsAsync(userId);
+					for (const [_, group] of pairs(groups)) {
+						if (group.Id === this.props.GroupInfo.Id) {
+							rank = group.Rank;
+							GroupCache.set(userId, rank);
+						}
+					}
+					if (!rank) rank = 0;
+				}
+				if (rank > 0 && rank < this.PlayerRank && rank < this.props.BotRank) {
+					const userInfo = await Promise.try(
+						() => UserService.GetUserInfosByUserIdsAsync([userId])[0],
+					).catch();
+					const [image] = await Promise.try(() =>
+						Players.GetUserThumbnailAsync(userId, 'HeadShot', 'Size48x48'),
+					).catch();
+					if (userInfo) {
+						const result: SearchResults = {
+							Image: image,
+							DisplayName: userInfo.DisplayName,
+							Username: userInfo.Username,
+							UserId: userId,
+							InServer: false,
+						};
+						results.push(result);
+					}
 				}
 			}
 		}
@@ -236,6 +268,15 @@ class UserPageBase extends Roact.Component<PageProps, PageState> {
 	}
 
 	protected didUpdate(previousProps: PageProps, previousState: PageState): void {
+		if (
+			previousProps.PromptContainerVisible !== this.props.PromptContainerVisible &&
+			this.props.PromptContainerVisible
+		) {
+			this.setState({
+				SearchPlaceholder: true,
+				SearchText: '',
+			});
+		}
 		if (this.state.SearchText !== previousState.SearchText) {
 			if (this.CurrentThread) {
 				task.cancel(this.CurrentThread);
@@ -250,6 +291,7 @@ interface UserTileProps extends ThemeProps {
 	DisplayName: string;
 	Username: string;
 	InServer: boolean;
+	Selected: boolean;
 	LayoutOrder?: number;
 	PressedEvent?: () => void;
 }
@@ -261,7 +303,7 @@ class UserTile extends Roact.PureComponent<UserTileProps> {
 	constructor(props: UserTileProps) {
 		super(props);
 
-		this.stateMotor = new SingleMotor(0);
+		this.stateMotor = new SingleMotor(this.props.Selected ? 0.12 : 0);
 
 		const [stateBinding, setStateBinding] = Roact.createBinding(this.stateMotor.getValue());
 
@@ -287,20 +329,24 @@ class UserTile extends Roact.PureComponent<UserTileProps> {
 				AutoButtonColor={false}
 				Event={{
 					MouseButton1Click: async () => {
-						if (this.props.PressedEvent) {
+						if (this.props.PressedEvent && !this.props.Selected) {
 							this.props.PressedEvent();
 						}
 					},
 					MouseButton1Up: async () => {
+						if (this.props.Selected) return;
 						this.stateMotor.setGoal(new Linear(0.08, { velocity: 0.5 }));
 					},
 					MouseEnter: () => {
+						if (this.props.Selected) return;
 						this.stateMotor.setGoal(new Linear(0.08, { velocity: 0.5 }));
 					},
 					MouseButton1Down: () => {
+						if (this.props.Selected) return;
 						this.stateMotor.setGoal(new Linear(0.12, { velocity: 0.5 }));
 					},
 					MouseLeave: () => {
+						if (this.props.Selected) return;
 						this.stateMotor.setGoal(new Linear(0, { velocity: 0.5 }));
 					},
 				}}
@@ -389,9 +435,26 @@ class UserTile extends Roact.PureComponent<UserTileProps> {
 			</textbutton>
 		);
 	}
+
+	protected didUpdate(previousProps: UserTileProps, previousState: {}): void {
+		if (previousProps.Selected !== this.props.Selected) {
+			if (this.props.Selected) {
+				this.stateMotor.setGoal(new Instant(0.12));
+			} else {
+				this.stateMotor.setGoal(new Linear(0, { velocity: 0.5 }));
+			}
+		}
+	}
 }
 
-export default class UserPage extends RouteBase<{ Theme: ThemeState; OnChanged?: (userId: number) => void }> {
+export default class UserPage extends RouteBase<{
+	GroupInfo: GroupInfo;
+	BotRank: number;
+	PromptContainerVisible: boolean;
+	SelectedUser: number;
+	Theme: ThemeState;
+	OnChanged?: (userId: number) => void;
+}> {
 	render() {
 		return (
 			<UserPageBase

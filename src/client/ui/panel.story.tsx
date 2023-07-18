@@ -1,6 +1,8 @@
 import { Scheme, Theme, ThemeState } from '@rbxts/material-ui';
 import Roact from '@rbxts/roact';
-import MainUI from '.';
+import { GroupService } from '@rbxts/services';
+import { ClientAction, PromptType } from 'shared/types';
+import Panel from '.';
 
 // for use with hoarcekat (https://github.com/Kampfkarren/hoarcekat)
 export = function (frame: GuiObject) {
@@ -10,7 +12,34 @@ export = function (frame: GuiObject) {
 		Scheme: scheme,
 		Theme: Theme.Light,
 	};
-	const component = <MainUI GroupName='Group Name' GroupId={1} Theme={theme} />;
+	const groupInfo = GroupService.GetGroupInfoAsync(1);
+	const actions: ClientAction[] = [
+		{
+			Name: 'Rank',
+			Description: 'Moves the user to a specified rank in the group.',
+			Args: [
+				{
+					Name: 'User',
+					Type: PromptType.User,
+				},
+				{
+					Name: 'Rank',
+					Type: PromptType.Rank,
+				},
+			],
+		},
+		{
+			Name: 'Promote',
+			Description: 'Moves the user one rank up in the group.',
+			Args: [
+				{
+					Name: 'User',
+					Type: PromptType.User,
+				},
+			],
+		},
+	];
+	const component = <Panel GroupInfo={groupInfo} BotRank={255} Actions={actions} Theme={theme} />;
 
 	const tree = Roact.mount(component, frame);
 

@@ -1,8 +1,8 @@
-import { Linear, SingleMotor } from '@rbxts/flipper';
+import { Instant, Linear, SingleMotor } from '@rbxts/flipper';
 import { Icon, ThemeProps, ThemeState } from '@rbxts/material-ui';
 import { Gotham, GothamBold } from '@rbxts/material-ui/out/Fonts';
 import Roact from '@rbxts/roact';
-import { GroupService, Players } from '@rbxts/services';
+import { Players } from '@rbxts/services';
 import RouteBase from './pageBase';
 
 interface SearchResults {
@@ -15,8 +15,11 @@ interface PageProps {
 	FadeBinding: Roact.Binding<number>;
 	Visible: boolean;
 	PageVisible: boolean;
+	PromptContainerVisible: boolean;
+	SelectedRank: number;
+	GroupInfo: GroupInfo;
+	BotRank: number;
 	Theme: ThemeState;
-	GroupId: number;
 	OnChanged?: (rank: number) => void;
 }
 
@@ -28,13 +31,10 @@ interface PageState {
 }
 
 class RankPageBase extends Roact.Component<PageProps, PageState> {
-	GroupInfo: GroupInfo;
 	CurrentThread?: thread;
 
 	constructor(props: PageProps) {
 		super(props);
-
-		this.GroupInfo = GroupService.GetGroupInfoAsync(this.props.GroupId);
 
 		this.setState({
 			SearchText: '',
@@ -54,6 +54,7 @@ class RankPageBase extends Roact.Component<PageProps, PageState> {
 			results.push(
 				<RankTile
 					{...result}
+					Selected={this.props.SelectedRank === result.Rank}
 					Theme={theme}
 					PressedEvent={() => {
 						if (this.props.OnChanged) {
@@ -85,7 +86,7 @@ class RankPageBase extends Roact.Component<PageProps, PageState> {
 						Position={UDim2.fromScale(0.5, 0.5)}
 						Size={new UDim2(1, -24, 1, 0)}
 						BackgroundColor3={theme.Scheme.surfaceVariant}
-						Text=''
+						Text={this.state.SearchText}
 						TextColor3={theme.Scheme.onSurfaceVariant}
 						PlaceholderColor3={theme.Scheme.onSurfaceVariant}
 						FontFace={GothamBold}
@@ -190,8 +191,12 @@ class RankPageBase extends Roact.Component<PageProps, PageState> {
 
 		searchText = searchText.lower();
 
-		for (const [_, role] of pairs(this.GroupInfo.Roles)) {
-			if (role.Rank >= Players.LocalPlayer.GetRankInGroup(this.props.GroupId)) continue;
+		for (const [_, role] of pairs(this.props.GroupInfo.Roles)) {
+			if (
+				role.Rank >= Players.LocalPlayer.GetRankInGroup(this.props.GroupInfo.Id) ||
+				role.Rank >= this.props.BotRank
+			)
+				continue;
 			if (role.Name.lower().find(searchText)[0] || tostring(role.Rank).lower().find(searchText)[0]) {
 				results.push(role);
 			}
@@ -204,6 +209,15 @@ class RankPageBase extends Roact.Component<PageProps, PageState> {
 	}
 
 	protected didUpdate(previousProps: PageProps, previousState: PageState): void {
+		if (
+			previousProps.PromptContainerVisible !== this.props.PromptContainerVisible &&
+			this.props.PromptContainerVisible
+		) {
+			this.setState({
+				SearchPlaceholder: true,
+				SearchText: '',
+			});
+		}
 		if (this.state.SearchText !== previousState.SearchText) {
 			if (this.CurrentThread) {
 				task.cancel(this.CurrentThread);
@@ -216,6 +230,7 @@ class RankPageBase extends Roact.Component<PageProps, PageState> {
 interface RankTileProps extends ThemeProps {
 	Name: string;
 	Rank: number;
+	Selected?: boolean;
 	PressedEvent?: () => void;
 }
 
@@ -226,7 +241,7 @@ class RankTile extends Roact.PureComponent<RankTileProps> {
 	constructor(props: RankTileProps) {
 		super(props);
 
-		this.stateMotor = new SingleMotor(0);
+		this.stateMotor = new SingleMotor(this.props.Selected ? 0.12 : 0);
 
 		const [stateBinding, setStateBinding] = Roact.createBinding(this.stateMotor.getValue());
 
@@ -252,20 +267,24 @@ class RankTile extends Roact.PureComponent<RankTileProps> {
 				AutoButtonColor={false}
 				Event={{
 					MouseButton1Click: async () => {
-						if (this.props.PressedEvent) {
+						if (this.props.PressedEvent && !this.props.Selected) {
 							this.props.PressedEvent();
 						}
 					},
 					MouseButton1Up: async () => {
+						if (this.props.Selected) return;
 						this.stateMotor.setGoal(new Linear(0.08, { velocity: 0.5 }));
 					},
 					MouseEnter: () => {
+						if (this.props.Selected) return;
 						this.stateMotor.setGoal(new Linear(0.08, { velocity: 0.5 }));
 					},
 					MouseButton1Down: () => {
+						if (this.props.Selected) return;
 						this.stateMotor.setGoal(new Linear(0.12, { velocity: 0.5 }));
 					},
 					MouseLeave: () => {
+						if (this.props.Selected) return;
 						this.stateMotor.setGoal(new Linear(0, { velocity: 0.5 }));
 					},
 				}}
@@ -301,11 +320,24 @@ class RankTile extends Roact.PureComponent<RankTileProps> {
 			</textbutton>
 		);
 	}
+
+	protected didUpdate(previousProps: RankTileProps, previousState: {}): void {
+		if (previousProps.Selected !== this.props.Selected) {
+			if (this.props.Selected) {
+				this.stateMotor.setGoal(new Instant(0.12));
+			} else {
+				this.stateMotor.setGoal(new Linear(0, { velocity: 0.5 }));
+			}
+		}
+	}
 }
 
 export default class RankPage extends RouteBase<{
 	Theme: ThemeState;
-	GroupId: number;
+	GroupInfo: GroupInfo;
+	SelectedRank: number;
+	BotRank: number;
+	PromptContainerVisible: boolean;
 	OnChanged?: (rank: number) => void;
 }> {
 	render() {

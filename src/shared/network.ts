@@ -1,15 +1,17 @@
 import { Networking } from '@flamework/networking';
-import { Settings } from './types';
+import { ClientAction, Settings } from './types';
 
-interface ServerEvents {}
+interface ServerEvents {
+	RunAction(Action: string, Args: Map<string, unknown>): void;
+}
 
 interface ClientEvents {
-	InitializePanel(Settings: Settings): void;
+	InitializePanel(Settings: Settings, Actions: ClientAction[]): void;
 }
 
 interface ServerFunctions {}
 
 interface ClientFunctions {}
 
-export const GlobalEvents = Networking.createEvent<ServerEvents, ClientEvents>();
-export const GlobalFunctions = Networking.createFunction<ServerFunctions, ClientFunctions>();
+export const PanelEvents = Networking.createEvent<ServerEvents, ClientEvents>();
+export const PanelFunctions = Networking.createFunction<ServerFunctions, ClientFunctions>();

@@ -1,5 +1,4 @@
 import { Linear, SingleMotor } from '@rbxts/flipper';
-import Llama from '@rbxts/llama';
 import { ThemeState, Topbar, UIBase } from '@rbxts/material-ui';
 import { Gotham } from '@rbxts/material-ui/out/Fonts';
 import Roact from '@rbxts/roact';
@@ -7,13 +6,14 @@ import { connect } from '@rbxts/roact-rodux';
 import { PanelState, panelStore } from 'client/state';
 import { PromptState } from 'client/state/reducers/promptReducer';
 import { $package } from 'rbxts-transform-debug';
-import { PromptArg, PromptType } from 'shared/types';
+import { ClientAction } from 'shared/types';
 import ActionTile from './actionTile';
 import Prompt from './prompt';
 
 interface MainProps {
-	GroupName: string;
-	GroupId: number;
+	GroupInfo: GroupInfo;
+	BotRank: number;
+	Actions: ClientAction[];
 	Theme: ThemeState;
 	RemoveCredit?: boolean;
 }
@@ -35,6 +35,24 @@ class PanelBase extends Roact.Component<MainProps & PromptState> {
 
 	public render(): Roact.Element | undefined {
 		const theme = this.props.Theme;
+
+		const actionTiles: Roact.Element[] = [];
+		for (const [_, action] of pairs(this.props.Actions)) {
+			actionTiles.push(
+				<ActionTile
+					Title={action.Name}
+					Description={action.Description}
+					Theme={theme}
+					PressedEvent={() => {
+						panelStore.dispatch({ type: 'SetPromptArgs', promptArgs: action.Args });
+						panelStore.dispatch({ type: 'SetPromptName', promptName: action.Name });
+						panelStore.dispatch({ type: 'SetPromptVisible', promptVisible: true });
+					}}
+					Disabled={this.props.promptVisible}
+				/>,
+			);
+		}
+
 		return (
 			<UIBase
 				AnchorPoint={new Vector2(0.5, 0.5)}
@@ -56,7 +74,8 @@ class PanelBase extends Roact.Component<MainProps & PromptState> {
 				>
 					<uicorner CornerRadius={new UDim(0, 16)} />
 					<Prompt
-						GroupId={this.props.GroupId}
+						GroupInfo={this.props.GroupInfo}
+						BotRank={this.props.BotRank}
 						Visible={this.props.promptVisible}
 						Name={this.props.promptName}
 						Args={this.props.promptArgs}
@@ -67,7 +86,7 @@ class PanelBase extends Roact.Component<MainProps & PromptState> {
 					<uilistlayout SortOrder='LayoutOrder' />
 					<Topbar
 						Title={`${
-							this.props.GroupName
+							this.props.GroupInfo.Name
 						}<font color="#${theme.Scheme.onSurfaceVariant.ToHex()}" face="GothamMedium"> | Ranking Panel</font>`}
 						RichText
 						Theme={theme}
@@ -89,73 +108,7 @@ class PanelBase extends Roact.Component<MainProps & PromptState> {
 					>
 						<uilistlayout SortOrder='LayoutOrder' />
 						{/* todo */}
-						<ActionTile
-							Title='Rank'
-							Description='Moves the user to a specified rank in the group.'
-							Theme={theme}
-							PressedEvent={() => {
-								const arg1: PromptArg = {
-									Name: 'test',
-									Type: PromptType.Rank,
-									Value: 0,
-									OnChanged: (value) => {
-										const args = Llama.Dictionary.copyDeep(
-											panelStore.getState().promptState.promptArgs,
-										);
-										const arg = args[0];
-										if (arg) {
-											arg.Value = value;
-										}
-										args[0] = arg;
-										panelStore.dispatch({ type: 'SetPromptArgs', promptArgs: args });
-									},
-								};
-								const arg2: PromptArg = {
-									Name: 'test2',
-									Type: PromptType.User,
-									Value: 0,
-									OnChanged: (value) => {
-										const args = Llama.Dictionary.copyDeep(
-											panelStore.getState().promptState.promptArgs,
-										);
-										const arg = args[1];
-										if (arg) {
-											arg.Value = value;
-										}
-										args[1] = arg;
-										panelStore.dispatch({ type: 'SetPromptArgs', promptArgs: args });
-									},
-								};
-								panelStore.dispatch({ type: 'SetPromptArgs', promptArgs: [arg1, arg2] });
-								panelStore.dispatch({ type: 'SetPromptName', promptName: 'Rank' });
-								panelStore.dispatch({ type: 'SetPromptVisible', promptVisible: true });
-							}}
-							Disabled={this.props.promptVisible}
-						/>
-						<ActionTile
-							Title='Promote'
-							Description='Moves the user one rank up in the group.'
-							Theme={theme}
-							Disabled={this.props.promptVisible}
-						/>
-						<ActionTile
-							Title='Demote'
-							Description='Moves the user one rank down in the group.'
-							Theme={theme}
-							Disabled={this.props.promptVisible}
-						/>
-						<ActionTile
-							Title='Fire'
-							Description='Moves the user to the first rank in the group.'
-							Theme={theme}
-							Disabled={this.props.promptVisible}
-						/>
-						<ActionTile
-							Title='Shout'
-							Description='Posts a shout on the group.'
-							Theme={theme}
-							Disabled={this.props.promptVisible}
-						/>
+						{...actionTiles}
 					</scrollingframe>
 					<frame Key='Footer' Size={UDim2.fromScale(1, 0.075)} BackgroundTransparency={1}>
 						<frame
