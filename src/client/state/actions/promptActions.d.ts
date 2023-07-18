@@ -12,7 +12,3 @@ export interface ActionSetPromptName extends Action<'SetPromptName'> {
 export interface ActionSetPromptArgs extends Action<'SetPromptArgs'> {
 	promptArgs: PromptArg[];
 }
-
-export interface ActionSetPromptOnSubmitted extends Action<'SetPromptOnSubmitted'> {
-	promptOnSubmitted: () => void;
-}

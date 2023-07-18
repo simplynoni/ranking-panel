@@ -56,4 +56,8 @@ export default class ActionHandler {
 			action.Run(this.Player, args);
 		}
 	}
+
+	Destroy() {
+		this.Actions.clear();
+	}
 }

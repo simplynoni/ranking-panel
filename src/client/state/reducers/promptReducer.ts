@@ -1,12 +1,7 @@
 import { Dictionary } from '@rbxts/llama';
 import { createReducer } from '@rbxts/rodux';
 import { PromptArg } from 'shared/types';
-import {
-	ActionSetPromptArgs,
-	ActionSetPromptName,
-	ActionSetPromptOnSubmitted,
-	ActionSetPromptVisible,
-} from '../actions/promptActions';
+import { ActionSetPromptArgs, ActionSetPromptName, ActionSetPromptVisible } from '../actions/promptActions';
 
 export interface PromptState {
 	promptVisible: boolean;
@@ -22,11 +17,7 @@ const initialState: PromptState = {
 	promptOnSubmitted: () => {},
 };
 
-export type PromptActions =
-	| ActionSetPromptVisible
-	| ActionSetPromptName
-	| ActionSetPromptArgs
-	| ActionSetPromptOnSubmitted;
+export type PromptActions = ActionSetPromptVisible | ActionSetPromptName | ActionSetPromptArgs;
 
 export const promptReducer = createReducer<PromptState, PromptActions>(initialState, {
 	SetPromptVisible: (state, { promptVisible }) => {
@@ -37,8 +28,5 @@ export const promptReducer = createReducer<PromptState, PromptActions>(initialSt
 	},
 	SetPromptArgs: (state, { promptArgs }) => {
 		return Dictionary.merge(state, { promptArgs });
-	},
-	SetPromptOnSubmitted: (state, { promptOnSubmitted }) => {
-		return Dictionary.merge(state, { promptOnSubmitted });
 	},
 });

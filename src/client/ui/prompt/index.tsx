@@ -1,8 +1,11 @@
+import { Dictionary } from '@rbxts/llama';
 import { OutlinedButton, ThemeState, TonalButton, Topbar, UIBase } from '@rbxts/material-ui';
 import { Gotham } from '@rbxts/material-ui/out/Fonts';
 import Roact from '@rbxts/roact';
+import { Events } from 'client/network';
 import { panelStore } from 'client/state';
 import { PromptArg, PromptType } from 'shared/types';
+import ConfirmationPage from './confirmationPrompt';
 import RankPage from './rankPrompt';
 import UserPage from './userPrompt';
 
@@ -13,7 +16,6 @@ interface PromptProps {
 	Theme: ThemeState;
 	Name: string;
 	Args: PromptArg[];
-	OnSubmitted?: () => void;
 }
 
 interface PromptState {
@@ -94,6 +96,16 @@ export default class Prompt extends Roact.Component<PromptProps, PromptState> {
 				}
 			}
 		}
+		pages.push(
+			<ConfirmationPage
+				GroupInfo={this.props.GroupInfo}
+				Args={Dictionary.copyDeep(this.props.Args)}
+				ArgValues={Dictionary.copyDeep(this.state.Args)}
+				Visible={this.state.PageIndex === this.props.Args.size()}
+				Instant={this.state.Instant}
+				Theme={theme}
+			/>,
+		);
 
 		return (
 			<UIBase
@@ -108,7 +120,7 @@ export default class Prompt extends Roact.Component<PromptProps, PromptState> {
 					Title={`${
 						this.props.Name
 					} <font color="#${theme.Scheme.onSurfaceVariant.ToHex()}" face="GothamMedium">> ${
-						currentArg ? currentArg.Name : ''
+						currentArg ? currentArg.Name : 'Confirmation'
 					}</font>`}
 					Height={new UDim(0.2)}
 					TextAlignment={Enum.TextXAlignment.Left}
@@ -157,7 +169,7 @@ export default class Prompt extends Roact.Component<PromptProps, PromptState> {
 						BackgroundTransparency={1}
 						Text={`Prompt <font color="#${theme.Scheme.onSurface.ToHex()}" face="GothamMedium">${
 							this.state.PageIndex + 1
-						}</font> of ${this.props.Args.size()}`} // todo
+						}</font> of ${this.props.Args.size() + 1}`}
 						TextColor3={theme.Scheme.onSurfaceVariant}
 						FontFace={Gotham}
 						RichText
@@ -169,20 +181,31 @@ export default class Prompt extends Roact.Component<PromptProps, PromptState> {
 						AnchorPoint={new Vector2(1, 0.5)}
 						Position={new UDim2(1, -12, 0.5, 0)}
 						Size={new UDim2(0, 0, 1, -10)}
-						Text={this.state.PageIndex === this.props.Args.size() - 1 ? 'Submit' : 'Next'}
+						Text={this.state.PageIndex === this.props.Args.size() ? 'Submit' : 'Next'}
 						AutomaticSize
 						Theme={theme}
 						Pressed={() => {
-							const args = this.state.Args;
-							// args.clear();
+							if (this.state.PageIndex === this.props.Args.size()) {
+								Events.RunAction.fire(this.props.Name, this.state.Args);
+
+								panelStore.dispatch({ type: 'SetPromptVisible', promptVisible: false });
+
+								const args = this.state.Args;
+								args.clear();
+								this.setState({
+									Args: args,
+								});
+							}
+
 							this.setState({
-								PageIndex: math.min(this.state.PageIndex + 1, this.props.Args.size() - 1),
+								PageIndex: math.min(this.state.PageIndex + 1, this.props.Args.size()),
 								Instant: false,
-								// Args: args,
 							});
 						}}
 						Disabled={
-							this.props.Args[this.state.PageIndex]
+							this.state.PageIndex === this.props.Args.size()
+								? false
+								: this.props.Args[this.state.PageIndex]
 								? !this.state.Args.get(this.props.Args[this.state.PageIndex].Name)
 								: true
 						}
