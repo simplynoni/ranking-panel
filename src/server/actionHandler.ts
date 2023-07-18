@@ -13,7 +13,12 @@ export default class ActionHandler {
 			for (const [_, module] of pairs(actions.GetChildren())) {
 				if (!module.IsA('ModuleScript')) continue;
 				const action = require(module);
-				if (!actionTypeCheck(action)) continue;
+				if (!actionTypeCheck(action)) {
+					warn(
+						`RankingPanel | Action '${module.Name}' failed typecheck! Make sure you didn't edit anything that would cause it to break.`,
+					);
+					continue;
+				}
 
 				let hasPermission = false;
 				if (action.Permissions.Users.includes(Player.UserId)) {

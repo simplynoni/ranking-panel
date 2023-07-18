@@ -1,7 +1,14 @@
+import { Flamework } from '@flamework/core';
 import { Chat, Players, TextChatService } from '@rbxts/services';
+import { Settings } from 'shared/types';
 import ActionHandler from './actionHandler';
 import config from './config';
 import { Events } from './network';
+
+const configTypeCheck = Flamework.createGuard<Settings>();
+if (!configTypeCheck(config)) {
+	throw "RankingPanel | Config failed typecheck! Make sure you didn't delete anything, or add invalid values.";
+}
 
 const ActionHandlers = new Map<Player, ActionHandler>();
 
@@ -31,7 +38,7 @@ Events.RunAction.connect((player, action, args) => {
 });
 
 if (config.ChatCommand) {
-	// Legacy chat
+	// Legacy Chat
 	Chat.RegisterChatCallback(
 		'OnServerReceivingMessage',
 		(message: { ShouldDeliver: boolean; Message: string; SpeakerUserId: number }) => {
