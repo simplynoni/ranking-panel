@@ -3,7 +3,7 @@ import { OutlinedButton, ThemeState, TonalButton, Topbar, UIBase } from '@rbxts/
 import { Gotham } from '@rbxts/material-ui/out/Fonts';
 import Roact from '@rbxts/roact';
 import { Events } from 'client/network';
-import { panelStore } from 'client/state';
+import { clientStore } from 'client/state';
 import { PromptArg, PromptType } from 'shared/types';
 import ConfirmationPage from './confirmationPrompt';
 import RankPage from './rankPrompt';
@@ -151,7 +151,7 @@ export default class Prompt extends Roact.Component<PromptProps, PromptState> {
 						this.setState({
 							Args: args,
 						});
-						panelStore.dispatch({ type: 'SetPromptVisible', promptVisible: false });
+						clientStore.dispatch({ type: 'SetPromptVisible', promptVisible: false });
 					}}
 				/>
 				<frame Key='Content' Size={UDim2.fromScale(1, 0.6)} BackgroundTransparency={1}>
@@ -207,7 +207,7 @@ export default class Prompt extends Roact.Component<PromptProps, PromptState> {
 							if (this.state.PageIndex === this.props.Args.size()) {
 								Events.RunAction.fire(this.props.Name, this.state.Args);
 
-								panelStore.dispatch({ type: 'SetPromptVisible', promptVisible: false });
+								clientStore.dispatch({ type: 'SetPromptVisible', promptVisible: false });
 
 								const args = this.state.Args;
 								args.clear();

@@ -3,7 +3,8 @@ import { ThemeState, Topbar, UIBase } from '@rbxts/material-ui';
 import { Gotham } from '@rbxts/material-ui/out/Fonts';
 import Roact from '@rbxts/roact';
 import { connect } from '@rbxts/roact-rodux';
-import { PanelState, panelStore } from 'client/state';
+import { ClientState, clientStore } from 'client/state';
+import { PanelState } from 'client/state/reducers/panelReducer';
 import { PromptState } from 'client/state/reducers/promptReducer';
 import { $package } from 'rbxts-transform-debug';
 import { ClientAction } from 'shared/types';
@@ -18,11 +19,11 @@ interface MainProps {
 	RemoveCredit?: boolean;
 }
 
-class PanelBase extends Roact.Component<MainProps & PromptState> {
+class PanelBase extends Roact.Component<MainProps & PromptState & PanelState> {
 	scrimMotor: SingleMotor;
 	scrimBinding: Roact.Binding<number>;
 
-	constructor(props: MainProps & PromptState) {
+	constructor(props: MainProps & PromptState & PanelState) {
 		super(props);
 
 		this.scrimMotor = new SingleMotor(!!this.props.promptVisible ? 0.4 : 0);
@@ -44,9 +45,9 @@ class PanelBase extends Roact.Component<MainProps & PromptState> {
 					Description={action.Description}
 					Theme={theme}
 					PressedEvent={() => {
-						panelStore.dispatch({ type: 'SetPromptArgs', promptArgs: action.Args });
-						panelStore.dispatch({ type: 'SetPromptName', promptName: action.Name });
-						panelStore.dispatch({ type: 'SetPromptVisible', promptVisible: true });
+						clientStore.dispatch({ type: 'SetPromptArgs', promptArgs: action.Args });
+						clientStore.dispatch({ type: 'SetPromptName', promptName: action.Name });
+						clientStore.dispatch({ type: 'SetPromptVisible', promptVisible: true });
 					}}
 					Disabled={this.props.promptVisible}
 				/>,
@@ -63,6 +64,7 @@ class PanelBase extends Roact.Component<MainProps & PromptState> {
 				MaxSize={new Vector2(1000)}
 				MinSize={new Vector2(500)}
 				Theme={theme}
+				Closed={!this.props.panelVisible}
 			>
 				<frame
 					Key='Scrim'
@@ -91,8 +93,7 @@ class PanelBase extends Roact.Component<MainProps & PromptState> {
 						RichText
 						Theme={theme}
 						CloseFunction={() => {
-							// todo
-							print('close');
+							clientStore.dispatch({ type: 'SetPanelVisible', panelVisible: false });
 						}}
 					/>
 					<scrollingframe
@@ -143,6 +144,6 @@ class PanelBase extends Roact.Component<MainProps & PromptState> {
 	}
 }
 
-export default connect<PromptState, {}, MainProps, PanelState>((state, props) => {
-	return { ...state.promptState };
+export default connect<PromptState & PanelState, {}, MainProps, ClientState>((state, props) => {
+	return { ...state.promptState, ...state.panelState };
 })(PanelBase);

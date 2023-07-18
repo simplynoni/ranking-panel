@@ -1,12 +1,13 @@
 import { Scheme, Theme, ThemeState } from '@rbxts/material-ui';
 import Roact from '@rbxts/roact';
 import { StoreProvider } from '@rbxts/roact-rodux';
-import { GroupService, Players } from '@rbxts/services';
+import { ContextActionService, GroupService, Players } from '@rbxts/services';
 import { Events } from './network';
-import { panelStore } from './state';
+import { clientStore } from './state';
 import Panel from './ui';
 
-const playerGui = Players.LocalPlayer.WaitForChild('PlayerGui') as PlayerGui;
+const player = Players.LocalPlayer;
+const playerGui = player.WaitForChild('PlayerGui') as PlayerGui;
 
 Events.InitializePanel.connect((settings, actions) => {
 	const groupInfo = GroupService.GetGroupInfoAsync(settings.GroupId);
@@ -19,7 +20,7 @@ Events.InitializePanel.connect((settings, actions) => {
 
 	Roact.mount(
 		<screengui ResetOnSpawn={false} ZIndexBehavior={'Sibling'} IgnoreGuiInset>
-			<StoreProvider store={panelStore}>
+			<StoreProvider store={clientStore}>
 				<Panel
 					GroupInfo={groupInfo}
 					BotRank={settings.BotRank}
@@ -32,4 +33,19 @@ Events.InitializePanel.connect((settings, actions) => {
 		playerGui,
 		'RankingPanel',
 	);
+
+	ContextActionService.BindAction(
+		'OpenPanel',
+		(_, state) => {
+			if (state === Enum.UserInputState.Begin) {
+				clientStore.dispatch({ type: 'SetPanelVisible', panelVisible: true });
+			}
+		},
+		false,
+		settings.Keybind,
+	);
+
+	Events.ShowPanel.connect(() => {
+		clientStore.dispatch({ type: 'SetPanelVisible', panelVisible: true });
+	});
 });

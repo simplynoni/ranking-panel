@@ -1,14 +1,17 @@
 import { Store, combineReducers } from '@rbxts/rodux';
+import { PanelActions, PanelState, panelReducer } from './reducers/panelReducer';
 import { PromptActions, PromptState, promptReducer } from './reducers/promptReducer';
 
-export interface PanelState {
+export interface ClientState {
 	promptState: PromptState;
+	panelState: PanelState;
 }
 
-export type PanelActions = PromptActions;
+export type ClientActions = PromptActions | PanelActions;
 
-export const storeReducer = combineReducers<PanelState, PanelActions>({
+export const storeReducer = combineReducers<ClientState, ClientActions>({
 	promptState: promptReducer,
+	panelState: panelReducer,
 });
 
-export const panelStore = new Store(storeReducer);
+export const clientStore = new Store(storeReducer);

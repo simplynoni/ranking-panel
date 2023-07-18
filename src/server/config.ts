@@ -2,6 +2,9 @@ import { Theme } from '@rbxts/material-ui';
 import { Settings } from 'shared/types';
 
 export = {
+	Keybind: Enum.KeyCode.Semicolon,
+	ChatCommand: '/panel',
+
 	GroupId: 5641002,
 	BotRank: 20,
 

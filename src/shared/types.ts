@@ -6,6 +6,9 @@ export interface Permissions {
 }
 
 export interface Settings {
+	Keybind: Enum.KeyCode;
+	ChatCommand: string;
+
 	GroupId: number;
 	BotRank: number;
 

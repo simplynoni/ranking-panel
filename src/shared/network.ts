@@ -7,6 +7,7 @@ interface ServerEvents {
 
 interface ClientEvents {
 	InitializePanel(Settings: Settings, Actions: ClientAction[]): void;
+	ShowPanel(): void;
 }
 
 interface ServerFunctions {}
