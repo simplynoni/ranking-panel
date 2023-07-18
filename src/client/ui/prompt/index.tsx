@@ -225,7 +225,7 @@ export default class Prompt extends Roact.Component<PromptProps, PromptState> {
 							this.state.PageIndex === this.props.Args.size()
 								? false
 								: this.props.Args[this.state.PageIndex]
-								? !this.state.Args.get(this.props.Args[this.state.PageIndex].Name)
+								? this.state.Args.get(this.props.Args[this.state.PageIndex].Name) === undefined
 								: true
 						}
 					/>
@@ -236,6 +236,16 @@ export default class Prompt extends Roact.Component<PromptProps, PromptState> {
 
 	protected didUpdate(previousProps: PromptProps, previousState: PromptState): void {
 		if (previousProps.Visible !== this.props.Visible && this.props.Visible) {
+			for (const [_, arg] of pairs(this.props.Args)) {
+				if (arg.Type !== PromptType.Text) continue;
+				const args = this.state.Args;
+				if (args.get(arg.Name) === undefined) {
+					args.set(arg.Name, '');
+					this.setState({
+						Args: args,
+					});
+				}
+			}
 			this.setState({
 				PageIndex: 0,
 				Instant: true,

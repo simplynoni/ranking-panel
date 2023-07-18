@@ -78,7 +78,7 @@ class ConfirmationPageBase extends Roact.Component<PageProps, PageState> {
 			const elements: Roact.Element[] = [];
 			for (const [_, arg] of pairs(this.props.Args)) {
 				const argValue = this.props.ArgValues.get(arg.Name);
-				if (!argValue) continue;
+				if (argValue === undefined) continue;
 				if (arg.Type === PromptType.Rank && typeIs(argValue, 'number')) {
 					let rankName = '';
 					for (const [_, rank] of pairs(this.props.GroupInfo.Roles)) {
@@ -178,7 +178,7 @@ class ConfirmationPageBase extends Roact.Component<PageProps, PageState> {
 							<textlabel
 								Size={UDim2.fromScale(1, 0.175)}
 								BackgroundTransparency={1}
-								Text={argValue}
+								Text={argValue || '(empty)'}
 								FontFace={Gotham}
 								TextColor3={theme.Scheme.onBackground}
 								TextXAlignment='Left'
