@@ -1,8 +1,11 @@
 # Ranking Panel
 
-Roblox ranking panel
+A panel for managing roblox groups from within a game.
 
-wip
+Includes ranking & shout commands, and the ability to easily add more.
 
-should look something like this when its done
-![Ranking Panel](https://i.imgur.com/3Dksvkh.png)
+## Setup
+
+You can find the installation and setup guide [here](https://simplynoni.gitbook.io/ranking-panel/setup/installation).
+
+![Ranking Panel](https://i.imgur.com/QjiIGo8.png)
