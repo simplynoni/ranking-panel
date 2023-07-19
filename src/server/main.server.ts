@@ -1,14 +1,19 @@
 import { Flamework } from '@flamework/core';
 import { Chat, Players, TextChatService } from '@rbxts/services';
-import { Settings } from 'shared/types';
+import { RankingModule, Settings } from 'shared/types';
 import NotificationHandler from '../shared/modules/notificationHandler';
 import ActionHandler from './actionHandler';
 import config from './config';
 import { Events } from './network';
+import rankingModule from './rankingModule';
 
 const configTypeCheck = Flamework.createGuard<Settings>();
 if (!configTypeCheck(config)) {
 	throw "RankingPanel | Config failed typecheck! Make sure you didn't delete anything, or add invalid values.";
+}
+const rankingModuleTypeCheck = Flamework.createGuard<RankingModule>();
+if (!rankingModuleTypeCheck(rankingModule)) {
+	throw 'RankingPanel | Ranking module failed typecheck! Make sure you make any changes that would break it.';
 }
 
 const ActionHandlers = new Map<Player, ActionHandler>();

@@ -88,10 +88,7 @@ Events.InitializePanel.connect((settings, actions) => {
 				Id: HttpService.GenerateGUID(false),
 				Content: text,
 				Duration: 5,
-				ColorScheme:
-					notifType === NotificationType.Error
-						? ContainerScheme.ErrorContainer
-						: ContainerScheme.PrimaryContainer,
+				ColorScheme: notifType === NotificationType.Error ? ContainerScheme.ErrorContainer : 'Surface',
 			},
 		});
 	});

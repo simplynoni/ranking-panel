@@ -44,6 +44,11 @@ export interface Action {
 
 export type ClientAction = Omit<Action, 'Run' | 'Permissions'>;
 
+export interface RankingModule {
+	Rank(userId: number, rank: number): Promise<boolean>;
+	Shout(message: string): Promise<boolean>;
+}
+
 export enum NotificationType {
 	Error,
 	Success,
