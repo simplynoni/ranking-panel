@@ -111,7 +111,6 @@ class PanelBase extends Roact.Component<MainProps & PromptState & PanelState> {
 						ScrollingEnabled={!this.props.promptVisible}
 					>
 						<uilistlayout SortOrder='LayoutOrder' />
-						{/* todo */}
 						{...actionTiles}
 					</scrollingframe>
 					<frame Key='Footer' Size={UDim2.fromScale(1, 0.075)} BackgroundTransparency={1}>

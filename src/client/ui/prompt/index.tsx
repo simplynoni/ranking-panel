@@ -155,7 +155,6 @@ export default class Prompt extends Roact.Component<PromptProps, PromptState> {
 					}}
 				/>
 				<frame Key='Content' Size={UDim2.fromScale(1, 0.6)} BackgroundTransparency={1}>
-					{/* Pages here */}
 					{...pages}
 				</frame>
 				<frame Key='Footer' Size={UDim2.fromScale(1, 0.2)} BackgroundTransparency={1}>

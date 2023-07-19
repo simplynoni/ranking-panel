@@ -1,6 +1,6 @@
 import { Dictionary } from '@rbxts/llama';
 import { ThemeState } from '@rbxts/material-ui';
-import { Gotham, GothamBold, GothamMedium } from '@rbxts/material-ui/out/Fonts';
+import { Gotham, GothamMedium } from '@rbxts/material-ui/out/Fonts';
 import Roact from '@rbxts/roact';
 import { UserService } from '@rbxts/services';
 import { PromptArg, PromptType } from 'shared/types';
@@ -47,22 +47,6 @@ class ConfirmationPageBase extends Roact.Component<PageProps, PageState> {
 				ZIndex={this.props.Visible ? 2 : 1}
 			>
 				<uilistlayout SortOrder='LayoutOrder' />
-				<textlabel
-					Size={UDim2.fromScale(1, 0.25)}
-					BackgroundTransparency={1}
-					Text='Is this correct?'
-					FontFace={GothamBold}
-					TextColor3={theme.Scheme.onBackground}
-					TextXAlignment='Left'
-					TextScaled
-				>
-					<uipadding
-						PaddingBottom={new UDim(0, 5)}
-						PaddingLeft={new UDim(0, 12)}
-						PaddingRight={new UDim(0, 12)}
-						PaddingTop={new UDim(0, 5)}
-					/>
-				</textlabel>
 				{...this.state.Elements}
 			</canvasgroup>
 		);
@@ -86,120 +70,75 @@ class ConfirmationPageBase extends Roact.Component<PageProps, PageState> {
 							rankName = rank.Name;
 						}
 					}
-					elements.push(
-						<>
-							<textlabel
-								Size={UDim2.fromScale(1, 0.2)}
-								BackgroundTransparency={1}
-								Text={arg.Name}
-								FontFace={GothamMedium}
-								TextColor3={theme.Scheme.onBackground}
-								TextXAlignment='Left'
-								TextScaled
-							>
-								<uipadding
-									PaddingBottom={new UDim(0, 5)}
-									PaddingLeft={new UDim(0, 12)}
-									PaddingRight={new UDim(0, 12)}
-								/>
-							</textlabel>
-							<textlabel
-								Size={UDim2.fromScale(1, 0.175)}
-								BackgroundTransparency={1}
-								Text={`${rankName} (${argValue})`}
-								FontFace={Gotham}
-								TextColor3={theme.Scheme.onBackground}
-								TextXAlignment='Left'
-								TextScaled
-							>
-								<uipadding
-									PaddingBottom={new UDim(0, 5)}
-									PaddingLeft={new UDim(0, 12)}
-									PaddingRight={new UDim(0, 12)}
-								/>
-							</textlabel>
-						</>,
-					);
+					elements.push(<Field Title={arg.Name} Body={`${rankName} (${argValue})`} Theme={theme} />);
 				} else if (arg.Type === PromptType.User && typeIs(argValue, 'number')) {
 					const userInfo = UserService.GetUserInfosByUserIdsAsync([argValue])[0];
 					if (!userInfo) continue;
 					elements.push(
-						<>
-							<textlabel
-								Size={UDim2.fromScale(1, 0.2)}
-								BackgroundTransparency={1}
-								Text={arg.Name}
-								FontFace={GothamMedium}
-								TextColor3={theme.Scheme.onBackground}
-								TextXAlignment='Left'
-								TextScaled
-							>
-								<uipadding
-									PaddingBottom={new UDim(0, 5)}
-									PaddingLeft={new UDim(0, 12)}
-									PaddingRight={new UDim(0, 12)}
-								/>
-							</textlabel>
-							<textlabel
-								Size={UDim2.fromScale(1, 0.175)}
-								BackgroundTransparency={1}
-								Text={`${userInfo.DisplayName} (@${userInfo.Username})`}
-								FontFace={Gotham}
-								TextColor3={theme.Scheme.onBackground}
-								TextXAlignment='Left'
-								TextScaled
-							>
-								<uipadding
-									PaddingBottom={new UDim(0, 5)}
-									PaddingLeft={new UDim(0, 12)}
-									PaddingRight={new UDim(0, 12)}
-								/>
-							</textlabel>
-						</>,
+						<Field
+							Title={arg.Name}
+							Body={`${userInfo.DisplayName} (@${userInfo.Username})`}
+							Theme={theme}
+						/>,
 					);
 				} else if (arg.Type === PromptType.Text && typeIs(argValue, 'string')) {
-					elements.push(
-						<>
-							<textlabel
-								Size={UDim2.fromScale(1, 0.2)}
-								BackgroundTransparency={1}
-								Text={arg.Name}
-								FontFace={GothamMedium}
-								TextColor3={theme.Scheme.onBackground}
-								TextXAlignment='Left'
-								TextScaled
-							>
-								<uipadding
-									PaddingBottom={new UDim(0, 5)}
-									PaddingLeft={new UDim(0, 12)}
-									PaddingRight={new UDim(0, 12)}
-								/>
-							</textlabel>
-							<textlabel
-								Size={UDim2.fromScale(1, 0.175)}
-								BackgroundTransparency={1}
-								Text={argValue || '(empty)'}
-								FontFace={Gotham}
-								TextColor3={theme.Scheme.onBackground}
-								TextXAlignment='Left'
-								TextTruncate='AtEnd'
-								TextScaled
-							>
-								<uipadding
-									PaddingBottom={new UDim(0, 5)}
-									PaddingLeft={new UDim(0, 12)}
-									PaddingRight={new UDim(0, 12)}
-								/>
-								<uitextsizeconstraint MinTextSize={15} />
-							</textlabel>
-						</>,
-					);
+					elements.push(<Field Title={arg.Name} Body={argValue || '(empty)'} Truncate Theme={theme} />);
 				}
 			}
 			this.setState({
 				Elements: elements,
 			});
 		}
+	}
+}
+
+interface FieldProps {
+	Title: string;
+	Body: string;
+	Truncate?: boolean;
+	Theme: ThemeState;
+}
+
+class Field extends Roact.Component<FieldProps> {
+	public render(): Roact.Element | undefined {
+		const theme = this.props.Theme;
+
+		return (
+			<>
+				<textlabel
+					Size={UDim2.fromScale(1, 0.2)}
+					BackgroundTransparency={1}
+					Text={this.props.Title}
+					FontFace={GothamMedium}
+					TextColor3={theme.Scheme.onBackground}
+					TextXAlignment='Left'
+					TextScaled
+				>
+					<uipadding
+						PaddingTop={new UDim(0, 5)}
+						PaddingLeft={new UDim(0, 12)}
+						PaddingRight={new UDim(0, 12)}
+					/>
+				</textlabel>
+				<textlabel
+					Size={UDim2.fromScale(1, 0.175)}
+					BackgroundTransparency={1}
+					Text={this.props.Body}
+					FontFace={Gotham}
+					TextColor3={theme.Scheme.onBackground}
+					TextXAlignment='Left'
+					TextTruncate={this.props.Truncate ? 'AtEnd' : undefined}
+					TextScaled
+				>
+					<uipadding
+						PaddingTop={new UDim(0, 5)}
+						PaddingLeft={new UDim(0, 12)}
+						PaddingRight={new UDim(0, 12)}
+					/>
+					{this.props.Truncate ? <uitextsizeconstraint MinTextSize={15} /> : undefined}
+				</textlabel>
+			</>
+		);
 	}
 }
 
