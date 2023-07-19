@@ -1,12 +1,13 @@
 import { Flamework } from '@flamework/core';
 import { Action, ClientAction } from 'shared/types';
+import NotificationHandler from '../shared/modules/notificationHandler';
 
 const actionTypeCheck = Flamework.createGuard<Action>();
 
 export default class ActionHandler {
 	private Actions = new Map<string, Action>();
 
-	constructor(private readonly Player: Player) {
+	constructor(private readonly Player: Player, private readonly NotificationHandler: NotificationHandler) {
 		const actions = script.Parent?.FindFirstChild('actions');
 
 		if (actions) {
@@ -58,7 +59,7 @@ export default class ActionHandler {
 	RunAction(actionName: string, args: Map<string, unknown>) {
 		const action = this.Actions.get(actionName);
 		if (action) {
-			action.Run(this.Player, args);
+			action.Run(this.Player, this.NotificationHandler, args);
 		}
 	}
 

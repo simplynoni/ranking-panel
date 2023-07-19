@@ -30,5 +30,6 @@ export = {
 	Color: Color3.fromRGB(120, 28, 227),
 	Theme: Theme.Dark,
 
+	SoundsEnabled: true,
 	RemoveCredit: false,
 } satisfies Settings;

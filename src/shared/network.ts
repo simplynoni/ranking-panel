@@ -1,5 +1,5 @@
 import { Networking } from '@flamework/networking';
-import { ClientAction, Settings } from './types';
+import { ClientAction, NotificationType, Settings } from './types';
 
 interface ServerEvents {
 	RunAction(Action: string, Args: Map<string, unknown>): void;
@@ -8,6 +8,7 @@ interface ServerEvents {
 interface ClientEvents {
 	InitializePanel(Settings: Settings, Actions: ClientAction[]): void;
 	ShowPanel(): void;
+	NewNotifcation(Type: NotificationType, Text: string): void;
 }
 
 interface ServerFunctions {}

@@ -1,6 +1,7 @@
 import { Flamework } from '@flamework/core';
 import { Chat, Players, TextChatService } from '@rbxts/services';
 import { Settings } from 'shared/types';
+import NotificationHandler from '../shared/modules/notificationHandler';
 import ActionHandler from './actionHandler';
 import config from './config';
 import { Events } from './network';
@@ -13,7 +14,8 @@ if (!configTypeCheck(config)) {
 const ActionHandlers = new Map<Player, ActionHandler>();
 
 Players.PlayerAdded.Connect((player) => {
-	const actionHandler = new ActionHandler(player);
+	const notificationHandler = new NotificationHandler(player);
+	const actionHandler = new ActionHandler(player, notificationHandler);
 	ActionHandlers.set(player, actionHandler);
 
 	if (actionHandler.HasPanelPermission()) {
