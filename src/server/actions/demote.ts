@@ -42,7 +42,7 @@ export = {
 		if (success) {
 			return notification.Success('Successfully demoted user');
 		} else {
-			notification.Error('An error occurred. Please try again later');
+			notification.Error('An error occurred. Please try again later, or let a developer know.');
 		}
 	},
 } satisfies Action;

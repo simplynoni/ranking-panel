@@ -29,7 +29,7 @@ export = {
 				return notification.Success('Successfully posted shout');
 			}
 		} else {
-			return notification.Error('An error occurred. Please try again later');
+			return notification.Error('An error occurred. Please try again later, or let a developer know.');
 		}
 	},
 } satisfies Action;

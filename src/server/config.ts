@@ -1,15 +1,16 @@
 import { Theme } from '@rbxts/material-ui';
 import { Settings } from 'shared/types';
 
+// https://simplynoni.gitbook.io/ranking-panel/setup/panel-configuration
 export = {
 	Keybind: Enum.KeyCode.Semicolon,
 	ChatCommand: '/panel',
 
-	GroupId: 5641002,
-	BotRank: 20,
+	GroupId: 0,
+	BotRank: 0,
 
 	RankingPermissions: {
-		Users: [114336888],
+		Users: [],
 		Groups: [
 			{
 				GroupId: 0,
@@ -18,7 +19,7 @@ export = {
 		],
 	},
 	ShoutPermissions: {
-		Users: [114336888],
+		Users: [],
 		Groups: [
 			{
 				GroupId: 0,

@@ -8,10 +8,10 @@ import { Events } from './network';
 import rankingModule from './rankingModule';
 
 const configTypeCheck = Flamework.createGuard<Settings>();
+const rankingModuleTypeCheck = Flamework.createGuard<RankingModule>();
 if (!configTypeCheck(config)) {
 	throw "RankingPanel | Config failed typecheck! Make sure you didn't delete anything, or add invalid values.";
 }
-const rankingModuleTypeCheck = Flamework.createGuard<RankingModule>();
 if (!rankingModuleTypeCheck(rankingModule)) {
 	throw 'RankingPanel | Ranking module failed typecheck! Make sure you make any changes that would break it.';
 }

@@ -37,7 +37,7 @@ export = {
 		if (success) {
 			return notification.Success('Successfully ranked user');
 		} else {
-			return notification.Error('An error occurred. Please try again later');
+			return notification.Error('An error occurred. Please try again later, or let a developer know.');
 		}
 	},
 } satisfies Action;
