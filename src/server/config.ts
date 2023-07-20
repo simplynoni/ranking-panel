@@ -32,5 +32,4 @@ export = {
 	Theme: Theme.Dark,
 
 	SoundsEnabled: true,
-	RemoveCredit: false,
 } satisfies Settings;

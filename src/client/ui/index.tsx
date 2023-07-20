@@ -16,7 +16,6 @@ interface MainProps {
 	BotRank: number;
 	Actions: ClientAction[];
 	Theme: ThemeState;
-	RemoveCredit?: boolean;
 }
 
 class PanelBase extends Roact.Component<MainProps & PromptState & PanelState> {
@@ -127,9 +126,7 @@ class PanelBase extends Roact.Component<MainProps & PromptState & PanelState> {
 							Size={UDim2.fromScale(0.5, 0.5)}
 							BackgroundTransparency={1}
 							FontFace={Gotham}
-							Text={`${this.props.RemoveCredit ? '' : 'Made with ♥ by simplynoni | '}v${
-								$package.version
-							}`}
+							Text={'v' + $package.version}
 							TextColor3={theme.Scheme.onSurfaceVariant}
 							TextScaled
 						/>

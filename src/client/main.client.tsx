@@ -24,13 +24,7 @@ Events.InitializePanel.connect((settings, actions) => {
 		<StoreProvider store={clientStore}>
 			<>
 				<screengui Key='RankingPanel' ResetOnSpawn={false} ZIndexBehavior={'Sibling'} IgnoreGuiInset>
-					<Panel
-						GroupInfo={groupInfo}
-						BotRank={settings.BotRank}
-						Actions={actions}
-						Theme={theme}
-						RemoveCredit={settings.RemoveCredit}
-					/>
+					<Panel GroupInfo={groupInfo} BotRank={settings.BotRank} Actions={actions} Theme={theme} />
 				</screengui>
 				<screengui
 					Key='PanelNotifications'

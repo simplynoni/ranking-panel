@@ -20,7 +20,6 @@ export interface Settings {
 	Theme: Theme;
 
 	SoundsEnabled: boolean;
-	RemoveCredit: boolean;
 }
 
 export enum PromptType {
