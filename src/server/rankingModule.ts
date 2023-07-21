@@ -3,7 +3,7 @@ import { HttpService } from '@rbxts/services';
 import { RankingModule } from 'shared/types';
 
 // https://simplynoni.gitbook.io/ranking-panel/setup/ranking-module-configuration
-export const rankingModuleConfig = {
+const rankingModuleConfig = {
 	Url: '',
 	ApiKey: '',
 } satisfies RankingModuleConfig;
@@ -53,7 +53,7 @@ function HandleResponse(requestType: string, response: RequestAsyncResponse) {
 	return true;
 }
 
-export default {
+export = {
 	async Rank(userId, rank) {
 		let response;
 		try {
