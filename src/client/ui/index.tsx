@@ -9,11 +9,9 @@ import { PromptState } from 'client/state/reducers/promptReducer';
 import { $package } from 'rbxts-transform-debug';
 import { ClientAction } from 'shared/types';
 import ActionTile from './actionTile';
-import Prompt from './prompt';
 
 interface MainProps {
 	GroupInfo: GroupInfo;
-	BotRank: number;
 	Actions: ClientAction[];
 	Theme: ThemeState;
 }
@@ -48,7 +46,7 @@ class PanelBase extends Roact.Component<MainProps & PromptState & PanelState> {
 						clientStore.dispatch({ type: 'SetPromptName', promptName: action.Name });
 						clientStore.dispatch({ type: 'SetPromptVisible', promptVisible: true });
 					}}
-					Disabled={this.props.promptVisible}
+					Disabled={this.props.promptVisible || !this.props.panelVisible}
 				/>,
 			);
 		}
@@ -74,14 +72,6 @@ class PanelBase extends Roact.Component<MainProps & PromptState & PanelState> {
 					})}
 				>
 					<uicorner CornerRadius={new UDim(0, 16)} />
-					<Prompt
-						GroupInfo={this.props.GroupInfo}
-						BotRank={this.props.BotRank}
-						Visible={this.props.promptVisible}
-						Name={this.props.promptName}
-						Args={this.props.promptArgs}
-						Theme={theme}
-					/>
 				</frame>
 				<frame Key='Holder' Size={UDim2.fromScale(1, 1)} BackgroundTransparency={1}>
 					<uilistlayout SortOrder='LayoutOrder' />

@@ -7,6 +7,7 @@ import { Events } from './network';
 import { clientStore } from './state';
 import Panel from './ui';
 import Notifications from './ui/notifications';
+import Prompt from './ui/prompt';
 
 const player = Players.LocalPlayer;
 const playerGui = player.WaitForChild('PlayerGui') as PlayerGui;
@@ -24,7 +25,16 @@ Events.InitializePanel.connect((settings, actions) => {
 		<StoreProvider store={clientStore}>
 			<>
 				<screengui Key='RankingPanel' ResetOnSpawn={false} ZIndexBehavior={'Sibling'} IgnoreGuiInset>
-					<Panel GroupInfo={groupInfo} BotRank={settings.BotRank} Actions={actions} Theme={theme} />
+					<Panel GroupInfo={groupInfo} Actions={actions} Theme={theme} />
+				</screengui>
+				<screengui
+					Key='PanelPrompt'
+					ResetOnSpawn={false}
+					ZIndexBehavior={'Sibling'}
+					DisplayOrder={500}
+					IgnoreGuiInset
+				>
+					<Prompt GroupInfo={groupInfo} BotRank={settings.BotRank} Theme={theme} />
 				</screengui>
 				<screengui
 					Key='PanelNotifications'
