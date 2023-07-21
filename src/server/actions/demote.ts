@@ -25,6 +25,9 @@ export = {
 		const groupInfo = GroupService.GetGroupInfoAsync(config.GroupId);
 		for (const [index, role] of pairs(groupInfo.Roles)) {
 			if (role.Rank === currentRank) {
+				if (index === 1) {
+					return notification.Error('User is already at the lowest rank in the group');
+				}
 				const newRank = groupInfo.Roles[index - 2];
 				if (newRank) {
 					rank = newRank.Rank;
