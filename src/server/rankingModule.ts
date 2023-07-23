@@ -4,14 +4,14 @@ import { RankingModule } from 'shared/types';
 
 // https://simplynoni.gitbook.io/ranking-panel/setup/ranking-module-configuration
 const rankingModuleConfig = {
-	Url: '',
+	URL: '',
 	ApiKey: '',
 } satisfies RankingModuleConfig;
 
 // Do not touch anything beyond this point! (unless you know what you're doing)
 
 interface RankingModuleConfig {
-	Url: string;
+	URL: string;
 	ApiKey: string;
 }
 
@@ -26,9 +26,9 @@ if (!confgTypecheck(rankingModuleConfig)) {
 }
 
 // add '/' to end of url
-const url = rankingModuleConfig.Url;
-if (url.sub(url.size()) !== '/') {
-	rankingModuleConfig.Url = url + '/';
+const URL = rankingModuleConfig.URL;
+if (URL.sub(URL.size()) !== '/') {
+	rankingModuleConfig.URL = URL + '/';
 }
 
 const bodyTypecheck = Flamework.createGuard<ResponseBody>();
@@ -58,7 +58,7 @@ export = {
 		let response;
 		try {
 			response = HttpService.RequestAsync({
-				Url: rankingModuleConfig.Url + 'setrank',
+				Url: rankingModuleConfig.URL + 'setrank',
 				Method: 'POST',
 				Headers: { ['Content-Type']: 'application/json', ['authorization']: rankingModuleConfig.ApiKey },
 				Body: HttpService.JSONEncode({
@@ -77,7 +77,7 @@ export = {
 		let response;
 		try {
 			response = HttpService.RequestAsync({
-				Url: rankingModuleConfig.Url + 'shout',
+				Url: rankingModuleConfig.URL + 'shout',
 				Method: 'POST',
 				Headers: { ['Content-Type']: 'application/json', ['authorization']: rankingModuleConfig.ApiKey },
 				Body: HttpService.JSONEncode({
