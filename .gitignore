@@ -6,4 +6,4 @@ flamework.build
 *.rbxl
 *.rbxl.lock
 *.rbxlx.lock
-model.rbxmx
+*.rbxmx
