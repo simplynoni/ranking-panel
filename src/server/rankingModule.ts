@@ -41,7 +41,7 @@ function HandleResponse(requestType: string, response: RequestAsyncResponse) {
 		warn(`${requestType} request failed.`);
 		return false;
 	}
-	const body = response.Body;
+	const body = HttpService.JSONDecode(response.Body);
 	if (!bodyTypecheck(body)) {
 		warn(`${requestType} request returned invalid body.`);
 		return false;
@@ -60,7 +60,7 @@ export = {
 			response = HttpService.RequestAsync({
 				Url: rankingModuleConfig.Url + 'setrank',
 				Method: 'POST',
-				Headers: { authorization: rankingModuleConfig.ApiKey },
+				Headers: { ['Content-Type']: 'application/json', ['authorization']: rankingModuleConfig.ApiKey },
 				Body: HttpService.JSONEncode({
 					id: userId,
 					role: rank,
@@ -79,7 +79,7 @@ export = {
 			response = HttpService.RequestAsync({
 				Url: rankingModuleConfig.Url + 'shout',
 				Method: 'POST',
-				Headers: { authorization: rankingModuleConfig.ApiKey },
+				Headers: { ['Content-Type']: 'application/json', ['authorization']: rankingModuleConfig.ApiKey },
 				Body: HttpService.JSONEncode({
 					content: message,
 				}),
