@@ -1,8 +1,7 @@
 {
 	"name": "ranking-panel",
 	"version": "0.1.0",
-	"description": "",
-	"main": "index.js",
+	"description": "An open source panel for managing roblox groups from within a game.",
 	"scripts": {
 		"compile-model": "rbxtsc --verbose --optimizedLoops",
 		"rojo-build-model": "rojo build model.project.json -o model.rbxmx",
@@ -12,9 +11,8 @@
 		"build": "npm run compile && npm run rojo-build",
 		"watch": "rbxtsc -w"
 	},
-	"keywords": [],
-	"author": "",
-	"license": "ISC",
+	"author": "simplynoni",
+	"license": "MIT",
 	"devDependencies": {
 		"@rbxts/compiler-types": "^2.1.1-types.0",
 		"@rbxts/types": "^1.0.705",
