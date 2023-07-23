@@ -18,7 +18,7 @@ interface PageProps {
 }
 
 interface PageState {
-	Elements: Roact.Element[];
+	Fields: Roact.Element[];
 }
 
 class ConfirmationPageBase extends Roact.Component<PageProps, PageState> {
@@ -26,13 +26,11 @@ class ConfirmationPageBase extends Roact.Component<PageProps, PageState> {
 		super(props);
 
 		this.setState({
-			Elements: [],
+			Fields: [],
 		});
 	}
 
 	public render(): Roact.Element | undefined {
-		const theme = this.props.Theme;
-
 		return (
 			<canvasgroup
 				Key={'ConfirmationPage'}
@@ -47,46 +45,47 @@ class ConfirmationPageBase extends Roact.Component<PageProps, PageState> {
 				ZIndex={this.props.Visible ? 2 : 1}
 			>
 				<uilistlayout SortOrder='LayoutOrder' />
-				{...this.state.Elements}
+				{...this.state.Fields}
 			</canvasgroup>
 		);
 	}
 
-	protected didUpdate(previousProps: PageProps, previousState: {}): void {
+	GetFields() {
+		const theme = this.props.Theme;
+
+		const fields: Roact.Element[] = [];
+		for (const [_, arg] of pairs(this.props.Args)) {
+			const argValue = this.props.ArgValues.get(arg.Name);
+			if (argValue === undefined) continue;
+			if (arg.Type === PromptType.Rank && typeIs(argValue, 'number')) {
+				let rankName = '';
+				for (const [_, rank] of pairs(this.props.GroupInfo.Roles)) {
+					if (rank.Rank === argValue) {
+						rankName = rank.Name;
+					}
+				}
+				fields.push(<Field Title={arg.Name} Body={`${rankName} (${argValue})`} Theme={theme} />);
+			} else if (arg.Type === PromptType.User && typeIs(argValue, 'number')) {
+				const userInfo = UserService.GetUserInfosByUserIdsAsync([argValue])[0];
+				if (!userInfo) continue;
+				fields.push(
+					<Field Title={arg.Name} Body={`${userInfo.DisplayName} (@${userInfo.Username})`} Theme={theme} />,
+				);
+			} else if (arg.Type === PromptType.Text && typeIs(argValue, 'string')) {
+				fields.push(<Field Title={arg.Name} Body={argValue || '(empty)'} Truncate Theme={theme} />);
+			}
+		}
+		return fields;
+	}
+
+	protected didUpdate(previousProps: PageProps, previousState: PageState): void {
 		if (
 			!Dictionary.equalsDeep(previousProps.ArgValues, this.props.ArgValues) ||
 			!Dictionary.equalsDeep(previousProps.Args, this.props.Args)
 		) {
-			const theme = this.props.Theme;
-
-			const elements: Roact.Element[] = [];
-			for (const [_, arg] of pairs(this.props.Args)) {
-				const argValue = this.props.ArgValues.get(arg.Name);
-				if (argValue === undefined) continue;
-				if (arg.Type === PromptType.Rank && typeIs(argValue, 'number')) {
-					let rankName = '';
-					for (const [_, rank] of pairs(this.props.GroupInfo.Roles)) {
-						if (rank.Rank === argValue) {
-							rankName = rank.Name;
-						}
-					}
-					elements.push(<Field Title={arg.Name} Body={`${rankName} (${argValue})`} Theme={theme} />);
-				} else if (arg.Type === PromptType.User && typeIs(argValue, 'number')) {
-					const userInfo = UserService.GetUserInfosByUserIdsAsync([argValue])[0];
-					if (!userInfo) continue;
-					elements.push(
-						<Field
-							Title={arg.Name}
-							Body={`${userInfo.DisplayName} (@${userInfo.Username})`}
-							Theme={theme}
-						/>,
-					);
-				} else if (arg.Type === PromptType.Text && typeIs(argValue, 'string')) {
-					elements.push(<Field Title={arg.Name} Body={argValue || '(empty)'} Truncate Theme={theme} />);
-				}
-			}
+			const fields = this.GetFields();
 			this.setState({
-				Elements: elements,
+				Fields: fields,
 			});
 		}
 	}

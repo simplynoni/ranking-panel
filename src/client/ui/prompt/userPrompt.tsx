@@ -59,21 +59,7 @@ class UserPageBase extends Roact.Component<PageProps, PageState> {
 	public render(): Roact.Element | undefined {
 		const theme = this.props.Theme;
 
-		const results: Roact.Element[] = [];
-		for (const [_, result] of pairs(this.state.SearchResults)) {
-			results.push(
-				<UserTile
-					{...result}
-					Selected={this.props.SelectedUser === result.UserId}
-					Theme={theme}
-					PressedEvent={() => {
-						if (this.props.OnChanged) {
-							this.props.OnChanged(result.UserId);
-						}
-					}}
-				/>,
-			);
-		}
+		const results = this.GetResults();
 
 		return (
 			<canvasgroup
@@ -194,6 +180,28 @@ class UserPageBase extends Roact.Component<PageProps, PageState> {
 				</scrollingframe>
 			</canvasgroup>
 		);
+	}
+
+	GetResults() {
+		const theme = this.props.Theme;
+
+		const results: Roact.Element[] = [];
+		for (const [_, result] of pairs(this.state.SearchResults)) {
+			results.push(
+				<UserTile
+					{...result}
+					Selected={this.props.SelectedUser === result.UserId}
+					Theme={theme}
+					PressedEvent={() => {
+						if (this.props.OnChanged) {
+							this.props.OnChanged(result.UserId);
+						}
+					}}
+				/>,
+			);
+		}
+
+		return results;
 	}
 
 	async UpdateSearchResults(searchText: string) {

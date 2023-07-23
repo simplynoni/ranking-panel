@@ -34,22 +34,7 @@ class PanelBase extends Roact.Component<MainProps & PromptState & PanelState> {
 	public render(): Roact.Element | undefined {
 		const theme = this.props.Theme;
 
-		const actionTiles: Roact.Element[] = [];
-		for (const [_, action] of pairs(this.props.Actions)) {
-			actionTiles.push(
-				<ActionTile
-					Title={action.Name}
-					Description={action.Description}
-					Theme={theme}
-					PressedEvent={() => {
-						clientStore.dispatch({ type: 'SetPromptArgs', promptArgs: action.Args });
-						clientStore.dispatch({ type: 'SetPromptName', promptName: action.Name });
-						clientStore.dispatch({ type: 'SetPromptVisible', promptVisible: true });
-					}}
-					Disabled={this.props.promptVisible || !this.props.panelVisible}
-				/>,
-			);
-		}
+		const actionTiles = this.GetActionTiles();
 
 		return (
 			<UIBase
@@ -124,6 +109,28 @@ class PanelBase extends Roact.Component<MainProps & PromptState & PanelState> {
 				</frame>
 			</UIBase>
 		);
+	}
+
+	GetActionTiles() {
+		const theme = this.props.Theme;
+
+		const actionTiles: Roact.Element[] = [];
+		for (const [_, action] of pairs(this.props.Actions)) {
+			actionTiles.push(
+				<ActionTile
+					Title={action.Name}
+					Description={action.Description}
+					Theme={theme}
+					PressedEvent={() => {
+						clientStore.dispatch({ type: 'SetPromptArgs', promptArgs: action.Args });
+						clientStore.dispatch({ type: 'SetPromptName', promptName: action.Name });
+						clientStore.dispatch({ type: 'SetPromptVisible', promptVisible: true });
+					}}
+					Disabled={this.props.promptVisible || !this.props.panelVisible}
+				/>,
+			);
+		}
+		return actionTiles;
 	}
 
 	protected didUpdate(previousProps: MainProps & PromptState, previousState: {}): void {
