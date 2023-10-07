@@ -301,7 +301,7 @@ class RankTile extends Roact.PureComponent<RankTileProps> {
 					Key='Divider'
 					AnchorPoint={new Vector2(0.5, 0.5)}
 					Position={new UDim2(0.5, 0, 1, 1)}
-					Size={new UDim2(1, -24, 0, 1)}
+					Size={new UDim2(1, 0, 0, 1)}
 					BorderSizePixel={0}
 					BackgroundColor3={theme.Scheme.outline}
 				/>
